@@ -201,18 +201,18 @@ class SnapSlider extends HTMLElement {
       }
     });
 
-    // Determine if slide has been scrolled
+    // Determine if slide has been scrolled and debounce the user scrolling function
     this.elements.view.addEventListener('scroll',() => {
       this.debounce(this.determineUserScroll(), 100);
     }, { passive: false });
   }
 
   determineUserScroll() {
-    if (this.elements.view.scrollLeft === 0) {
+    if (this.elements.view.scrollLeft === 0) { // We're at the start of the slider
       this.changeSlide(0, true);
-    } else if (this.elements.view.scrollLeft === this.elements.view.scrollWidth) {
+    } else if (this.elements.view.scrollLeft === this.elements.view.scrollWidth) { // We're at the end of the slider
       this.changeSlide(this.elements.slides.length - 1, true);
-    } else {
+    } else { // Figure out where we are in the slider
       this.changeSlide(Math.round(this.elements.view.scrollLeft / this.elements.slides[0].offsetWidth), true)
     }
   }
