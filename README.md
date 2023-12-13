@@ -12,6 +12,7 @@ https://matoululu.github.io/snap-slider/
 
 ```html
 <snap-slider
+  id="mySlider"
   data-per-slide="1"
   data-initial-slide="0"
   data-slide-direction="horizontal"
