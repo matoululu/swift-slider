@@ -11,18 +11,18 @@ class SnapSlider extends HTMLElement {
     this.elements = {
       view:  this.querySelector('.snap-slider__view'),
       slides: this.querySelectorAll('.snap-slide'),
+      dots: this.querySelector('.snap-slider__dots'),
       nextButton: null,
-      prevButton: null,
-      dots: this.querySelector('.snap-slider__dots')
+      prevButton: null
     }
 
     this.settings = {
       perSlide: Number(this.dataset.perSlide ? this.dataset.perSlide : 1), // How many slides per view
-      initialSlide: Number(this.dataset.initialSlide ? this.dataset.initialSlide : 0),
-      sliderDirection: this.dataset.sliderDirection ? this.dataset.sliderDirection : 'horizontal',
-      sliderSpeed: Number(this.dataset.sliderSpeed ? this.dataset.sliderSpeed : 0),
-      showButtons: this.dataset.showButtons,
-      showDots: this.dataset.showDots,
+      initialSlide: Number(this.dataset.initialSlide ? this.dataset.initialSlide : 0), // The initial slide to display
+      sliderDirection: this.dataset.sliderDirection ? this.dataset.sliderDirection : 'horizontal', // Horizontal or vertical
+      sliderSpeed: Number(this.dataset.sliderSpeed ? this.dataset.sliderSpeed : 0), //Speed of slider in seconds (0 = disabled)
+      showButtons: this.dataset.showButtons, // Show or hide buttons
+      showDots: this.dataset.showDots // Show or hide dots
     }
   }
 
@@ -32,12 +32,10 @@ class SnapSlider extends HTMLElement {
     this.generateButtons();
     this.generateDots();
     this.eventHandler();
-
     if (this.settings.sliderSpeed !== 0) this.setSliderSpeed();
 
     // Emit event when slider is ready
     this.dispatchEvent(new CustomEvent('snap-slider:ready', { bubbles: true, detail: { slider: this } }));
-    console.log(this)
   }
 
   setSliderSpeed() {
@@ -49,7 +47,7 @@ class SnapSlider extends HTMLElement {
       } else {
         this.changeSlide(this.states.activeIndex + 1);
       }
-    }, this.settings.sliderSpeed*1000);
+    }, this.settings.sliderSpeed*1000); // Convert value to milliseconds
   }
 
   changeSlide(targetIndex, behavior = 'smooth') {
@@ -93,7 +91,7 @@ class SnapSlider extends HTMLElement {
   }
 
   eventHandler() {
-    /* NOTE: Prev and Next button events are handled in generatebuttons() */
+    /* NOTE: Dots, Prev and Next button events are handled in generateDots() and generateButtons() */
 
     // Determine if slider is hovered
     this.addEventListener('mouseover', () => {
