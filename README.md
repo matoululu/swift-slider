@@ -1,5 +1,5 @@
 # Snap-slider
-Create a slideshow quickly and easily
+A modern way to make slideshows 
 
 # snap-slider README
 ### Getting started
