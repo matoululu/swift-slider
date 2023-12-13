@@ -1,8 +1,10 @@
-# Snap-slider
-A modern way to make slideshows 
+# snap-slider
+A modern way to make slideshows
 
-# snap-slider README
-### Getting started
+## Demo
+https://codepen.io/matouio/pen/qBgGpGd?editors=1010
+
+## Getting started
 
 1. Ensure the snap-slider `.css` and `.js` files are included in you project.
 2. snap-slider is set up using a custom HTML element, a wrapper and a group of slides. A basic example of this can be seen below. (The data attributes in the example below are optional and can be removed if you wish to use the default settings)
@@ -28,10 +30,10 @@ A modern way to make slideshows
 
 3. When a `<snap-slider>` element is detected on the page the slider will initialize itself automatically.
 
-### Settings
+## Settings
 As you may have noticed in the example above you can use a few attributes to set up slider options.
 
-#### Events
+## Events
 
 | Event                   	| description                                        	| details                           	|
 |-------------------------	|----------------------------------------------------	|-----------------------------------	|

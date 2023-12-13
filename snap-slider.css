@@ -1,4 +1,5 @@
 :root {
+  --snapSliderViewHeight: auto;
   --snapSliderVerticalHeight: 800px;
   --snapSliderButtonBackground: #fff;
   --snapSliderButtonColor: #000;
@@ -16,6 +17,7 @@ snap-slider {
   overflow-x: scroll;
   scroll-snap-type: x mandatory;
   width: 100%;
+  height: var(--snapSliderViewHeight);
 }
 
 .snap-slide {

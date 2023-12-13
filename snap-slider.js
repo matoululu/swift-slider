@@ -27,7 +27,7 @@ class SnapSlider extends HTMLElement {
   }
 
   connectedCallback() {
-    this.changeSlide(this.settings.initialSlide, 'instant');
+    this.changeSlide(this.settings.initialSlide, false, 'instant');
     this.calculatePerSlide();
     this.generateButtons();
     this.generateDots();
@@ -38,18 +38,21 @@ class SnapSlider extends HTMLElement {
     this.dispatchEvent(new CustomEvent('snap-slider:ready', { bubbles: true, detail: { slider: this } }));
   }
 
-  changeSlide(targetIndex, behavior = 'smooth') {
-    if (this.settings.sliderDirection === 'horizontal') {
-      this.elements.view.scrollTo({
-        left: this.elements.slides[targetIndex].offsetLeft,
-        behavior: behavior
-      });
-    } else {
-      this.elements.view.scrollTo({
-        top: this.elements.slides[targetIndex].offsetTop,
-        behavior: behavior
-      });
+  changeSlide(targetIndex, skipScroll = false, behavior = 'smooth') {
+    if (!skipScroll) {
+      if (this.settings.sliderDirection === 'horizontal') {
+        this.elements.view.scrollTo({
+          left: this.elements.slides[targetIndex].offsetLeft,
+          behavior: behavior
+        });
+      } else {
+        this.elements.view.scrollTo({
+          top: this.elements.slides[targetIndex].offsetTop,
+          behavior: behavior
+        });
+      }
     }
+
 
     // Set active dot
     if (this.settings.showDots === 'true' && this.elements.dots) {
@@ -197,6 +200,21 @@ class SnapSlider extends HTMLElement {
         }
       }
     });
+
+    // Determine if slide has been scrolled
+    this.elements.view.addEventListener('scroll',() => {
+      this.debounce(this.determineUserScroll(), 100);
+    }, { passive: false });
+  }
+
+  determineUserScroll() {
+    if (this.elements.view.scrollLeft === 0) {
+      this.changeSlide(0, true);
+    } else if (this.elements.view.scrollLeft === this.elements.view.scrollWidth) {
+      this.changeSlide(this.elements.slides.length - 1, true);
+    } else {
+      this.changeSlide(Math.round(this.elements.view.scrollLeft / this.elements.slides[0].offsetWidth), true)
+    }
   }
 
   setSlideSpeed() {
@@ -209,6 +227,28 @@ class SnapSlider extends HTMLElement {
         this.changeSlide(this.states.activeIndex + 1);
       }
     }, this.settings.slideSpeed*1000); // Convert value to milliseconds
+  }
+
+  debounce(func, wait, immediate) {
+    let timeout;
+
+    return function executedFunction() {
+      const context = this;
+      const args = arguments;
+
+      const later = () => {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+
+      const callNow = immediate && !timeout;
+
+      clearTimeout(timeout);
+
+      timeout = setTimeout(later, wait);
+
+      if (callNow) func.apply(context, args);
+    };
   }
 }
 
