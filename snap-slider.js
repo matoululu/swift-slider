@@ -20,7 +20,7 @@ class SnapSlider extends HTMLElement {
       perSlide: Number(this.dataset.perSlide ? this.dataset.perSlide : 1), // How many slides per view
       initialSlide: Number(this.dataset.initialSlide ? this.dataset.initialSlide : 0), // The initial slide to display
       sliderDirection: this.dataset.sliderDirection ? this.dataset.sliderDirection : 'horizontal', // Horizontal or vertical
-      sliderSpeed: Number(this.dataset.sliderSpeed ? this.dataset.sliderSpeed : 0), //Speed of slider in seconds (0 = disabled)
+      slideSpeed: Number(this.dataset.slideSpeed ? this.dataset.slideSpeed : 0), //Speed of slider in seconds (0 = disabled)
       showButtons: this.dataset.showButtons, // Show or hide buttons
       showDots: this.dataset.showDots // Show or hide dots
     }
@@ -32,22 +32,10 @@ class SnapSlider extends HTMLElement {
     this.generateButtons();
     this.generateDots();
     this.eventHandler();
-    if (this.settings.sliderSpeed !== 0) this.setSliderSpeed();
+    if (this.settings.slideSpeed !== 0) this.setSlideSpeed();
 
     // Emit event when slider is ready
     this.dispatchEvent(new CustomEvent('snap-slider:ready', { bubbles: true, detail: { slider: this } }));
-  }
-
-  setSliderSpeed() {
-    this.slideInterval = setInterval(() => {
-      if (this.states.hovered) return;
-
-      if (this.states.activeIndex === this.elements.slides.length - 1) {
-        this.changeSlide(0);
-      } else {
-        this.changeSlide(this.states.activeIndex + 1);
-      }
-    }, this.settings.sliderSpeed*1000); // Convert value to milliseconds
   }
 
   changeSlide(targetIndex, behavior = 'smooth') {
@@ -88,39 +76,6 @@ class SnapSlider extends HTMLElement {
         slide.style = `height: ${100 / this.settings.perSlide}%; min-height: ${100 / this.settings.perSlide}%;`;
       });
     }
-  }
-
-  eventHandler() {
-    /* NOTE: Dots, Prev and Next button events are handled in generateDots() and generateButtons() */
-
-    // Determine if slider is hovered
-    this.addEventListener('mouseover', () => {
-      this.states.hovered = true;
-    });
-
-    // Determine if slider is not hovered
-    this.addEventListener('mouseleave', () => {
-      this.states.hovered = false;
-    });
-
-    // Determine left/right arrow keypress
-    document.addEventListener('keydown', (e) => {
-      if (!this.states.hovered) return;
-
-      if (e.key === 'ArrowRight') {
-        if (this.states.activeIndex === this.elements.slides.length - 1) {
-          this.changeSlide(0);
-        } else {
-          this.changeSlide(this.states.activeIndex + 1);
-        }
-      } else if (e.key === 'ArrowLeft') {
-        if (this.states.activeIndex === 0) {
-          this.changeSlide(this.elements.slides.length - 1);
-        } else {
-          this.changeSlide(this.states.activeIndex - 1);
-        }
-      }
-    });
   }
 
   generateButtons() {
@@ -186,6 +141,56 @@ class SnapSlider extends HTMLElement {
     this.elements.dots.addEventListener('click', (e) => {
       this.changeSlide(Number(e.target.dataset.dotIndex));
     });
+  }
+
+  eventHandler() {
+    /* NOTE: Dots, Prev and Next button events are handled in generateDots() and generateButtons() */
+
+    // Determine if slider is hovered
+    this.addEventListener('mouseover', () => {
+      this.states.hovered = true;
+    });
+
+    // Determine if slider is not hovered
+    this.addEventListener('mouseleave', () => {
+      this.states.hovered = false;
+    });
+
+    this.addEventListener('snap-slider:goto', (e) => {
+      if (!e.detail.id == this.id) return;
+      this.changeSlide(e.detail.targetIndex, 'instant');
+    });
+
+    // Determine left/right arrow keypress
+    document.addEventListener('keydown', (e) => {
+      if (!this.states.hovered) return;
+
+      if (e.key === 'ArrowRight') {
+        if (this.states.activeIndex === this.elements.slides.length - 1) {
+          this.changeSlide(0);
+        } else {
+          this.changeSlide(this.states.activeIndex + 1);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (this.states.activeIndex === 0) {
+          this.changeSlide(this.elements.slides.length - 1);
+        } else {
+          this.changeSlide(this.states.activeIndex - 1);
+        }
+      }
+    });
+  }
+
+  setSlideSpeed() {
+    this.slideInterval = setInterval(() => {
+      if (this.states.hovered) return;
+
+      if (this.states.activeIndex === this.elements.slides.length - 1) {
+        this.changeSlide(0);
+      } else {
+        this.changeSlide(this.states.activeIndex + 1);
+      }
+    }, this.settings.slideSpeed*1000); // Convert value to milliseconds
   }
 }
 
