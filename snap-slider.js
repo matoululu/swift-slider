@@ -146,6 +146,14 @@ class SnapSlider extends HTMLElement {
       dot.addEventListener('click', () => {
         this.changeSlide(index);
       });
+
+      // Determine if spacebar is pressed on dot
+      dot.addEventListener('keydown', (e) => {
+        if (e.key === ' ') {
+          this.changeSlide(index);
+        }
+      });
+
     });
 
     this.elements.dots = dots; // Set dots to elements
