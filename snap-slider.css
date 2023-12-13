@@ -2,6 +2,8 @@
   --snapSliderVerticalHeight: 800px;
   --snapSliderButtonBackground: #fff;
   --snapSliderButtonColor: #000;
+  --snapSliderTransitionDuration: 0.15s;
+  --snapSliderHoverBrightness: 0.7;
 }
 
 snap-slider {
@@ -69,15 +71,17 @@ snap-slider {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: filter 0.1s ease-in-out;
+  transition: filter var(--snapSliderTransitionDuration) ease-in-out;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
 }
 
 .snap-slider__button:hover,
-.snap-slider__button:focus {
-  filter: brightness(0.7);
+.snap-slider__button:focus,
+.snap-slider__dot:hover,
+.snap-slider__dot:focus {
+  filter: var(--snapSliderHoverBrightness);
 }
 
 .snap-slider__button[data-button-prev] {
@@ -98,6 +102,7 @@ snap-slider {
   width: 100%;
   z-index: 1;
   list-style: none;
+  margin: 0;
 }
 
 .snap-slider__dot {
@@ -107,8 +112,12 @@ snap-slider {
   background-color: var(--snapSliderButtonBackground);
   margin: 0 5px;
   cursor: pointer;
-  transition: filter 0.1s ease-in-out;
   display: flex;
   justify-content: center;
   align-items: center;
+  opacity: var(--snapSliderHoverBrightness);
+}
+
+.snap-slider__dot--active {
+  opacity: 1;
 }

@@ -5,7 +5,7 @@ class SnapSlider extends HTMLElement {
     this.elements = {
       view:  this.querySelector('.snap-slider__view'),
       slides: this.querySelectorAll('.snap-slide'),
-      dots: this.querySelector('.snap-slider__dots'),
+      dots: null,
       nextButton: null,
       prevButton: null
     }
@@ -51,6 +51,12 @@ class SnapSlider extends HTMLElement {
       });
     }
 
+    // Set active dot
+    if (this.settings.showDots === 'true' && this.elements.dots) {
+      this.querySelector('.snap-slider__dot--active').classList.remove('snap-slider__dot--active');
+      this.querySelectorAll('.snap-slider__dot')[targetIndex].classList.add('snap-slider__dot--active');
+    }
+
     // Set new activeIndex and prevIndex
     this.states.prevIndex = this.states.activeIndex;
     this.states.activeIndex = targetIndex;
@@ -88,12 +94,14 @@ class SnapSlider extends HTMLElement {
     prevButton.classList.add('snap-slider__button');
     prevButton.dataset.buttonPrev = '';
     prevButton.innerHTML = '&larr;';
+    prevButton.setAttribute('aria-label', 'Previous');
     buttons.appendChild(prevButton);
 
     const nextButton = document.createElement('button');
     nextButton.classList.add('snap-slider__button');
     nextButton.dataset.buttonNext = '';
     nextButton.innerHTML = '&rarr;';
+    nextButton.setAttribute('aria-label', 'Next');
     buttons.appendChild(nextButton);
 
     this.elements.prevButton = prevButton; // Set prevButton to elements
@@ -129,18 +137,20 @@ class SnapSlider extends HTMLElement {
     this.elements.slides.forEach((slide, index) => {
       const dot = document.createElement('li');
       dot.classList.add('snap-slider__dot');
-      dot.dataset.dotIndex = index;
+      if (index === this.settings.initialSlide) dot.classList.add('snap-slider__dot--active');
+      dot.setAttribute('tabindex', '0');
+      dot.setAttribute('aria-label', `Slide ${index + 1}`);
       dots.appendChild(dot);
+
+      // Determine if dot is pressed
+      dot.addEventListener('click', () => {
+        this.changeSlide(index);
+      });
     });
 
     this.elements.dots = dots; // Set dots to elements
 
     this.appendChild(dots);
-
-    // Determine if dot is pressed
-    this.elements.dots.addEventListener('click', (e) => {
-      this.changeSlide(Number(e.target.dataset.dotIndex));
-    });
   }
 
   eventHandler() {
