@@ -37,6 +37,6 @@ As you may have noticed in the example above you can use a few attributes to set
 
 | Event                   	| description                                        	| details                           	|
 |-------------------------	|----------------------------------------------------	|-----------------------------------	|
-| snap-slider:changed     	| Emits. Emitted when the current slide has changed. 	| previousIndex, targetIndex, slide 	|
+| snap-slider:changed     	| Emits. Emitted when the current slide has changed. 	| previousIndex, targetIndex, slider 	|
 | snap-slider:ready 	| Emits. Emitted when the slide has initially loaded 	| N/A                               	|
-| snap-slider:goto        	| Listens. Used to specifically set current slide requires `id` and `targetIndex`     	| index                             	|
+| snap-slider:goto        	| Listens. Used to specifically set current slide     	| targetIndex, id                             	|
