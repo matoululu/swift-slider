@@ -2,18 +2,18 @@ class SnapSlider extends HTMLElement {
   constructor() {
     super();
 
-    this.states = {
-      hovered: false, // Is the user hovering over the slideshow
-      activeIndex: 0, // The current active slide
-      prevIndex: 0 // The previous active slide
-    }
-
     this.elements = {
       view:  this.querySelector('.snap-slider__view'),
       slides: this.querySelectorAll('.snap-slide'),
       dots: this.querySelector('.snap-slider__dots'),
       nextButton: null,
       prevButton: null
+    }
+
+    this.states = {
+      hovered: false, // Is the user hovering over the slideshow
+      activeIndex: 0, // The current active slide
+      prevIndex: 0 // The previous active slide
     }
 
     this.settings = {
