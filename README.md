@@ -1,9 +1,6 @@
 # Snap-slider
 Create a slideshow quickly and easily
 
-## Demo
-https://matoululu.github.io/snap-slider/
-
 # snap-slider README
 ### Getting started
 
