@@ -22,7 +22,8 @@ class SwiftSlider extends HTMLElement {
       sliderDirection: this.dataset.sliderDirection ? this.dataset.sliderDirection : 'horizontal', // Horizontal or vertical
       sliderSpeed: Number(this.dataset.sliderSpeed ? this.dataset.sliderSpeed : 0), //Speed of slider in seconds (0 = disabled)
       showButtons: this.dataset.showButtons, // Show or hide buttons
-      showDots: this.dataset.showDots // Show or hide dots
+      showDots: this.dataset.showDots, // Show or hide dots
+      navFor: this.dataset.navFor // ID of slider to sync with
     }
   }
 
@@ -164,6 +165,16 @@ class SwiftSlider extends HTMLElement {
     this.appendChild(dots);
   }
 
+  navHandler(index) {
+    this.dispatchEvent(new CustomEvent('swift-slider:goto', {
+      bubbles: true,
+      detail: {
+        id: this.settings.navFor,
+        targetIndex: index
+      }
+    }));
+  }
+
   eventHandler() {
     /* NOTE: Dots, Prev and Next button events are handled in generateDots() and generateButtons() */
 
@@ -199,6 +210,14 @@ class SwiftSlider extends HTMLElement {
           this.changeSlide(this.states.activeIndex - 1);
         }
       }
+    });
+
+    // loop thru slides and determine if slide is clicked
+    this.elements.slides.forEach((slide, index) => {
+      if (!this.settings.navFor) return;
+      slide.addEventListener('click', () => {
+        this.navHandler(index);
+      });
     });
 
     // Determine if slide has been scrolled and debounce the user scrolling function
