@@ -12,8 +12,9 @@ class SwiftSlider extends HTMLElement {
 
     this.states = {
       hovered: false, // Is the user hovering over the slideshow
-      activeIndex: 0, // The current active slide
-      prevIndex: 0 // The previous active slide
+      currentIndex: 0, // The current active slide
+      prevIndex: 0, // The previous active slide
+      scrolling: false // Is the view currently scrolling
     }
 
     this.settings = {
@@ -35,6 +36,11 @@ class SwiftSlider extends HTMLElement {
     this.eventHandler();
     if (this.settings.sliderSpeed !== 0) this.setSlideSpeed();
 
+    if (this.settings.navFor) {
+      const navIndex = document.querySelector(`#${this.settings.navFor}`).dataset.initialSlide;
+      this.navHandler(navIndex);
+    }
+
     // Emit event when slider is ready
     this.dispatchEvent(new CustomEvent('swift-slider:ready', { bubbles: true, detail: { slider: this } }));
   }
@@ -54,24 +60,15 @@ class SwiftSlider extends HTMLElement {
       }
     }
 
-
     // Set active dot
     if (this.settings.showDots === 'true' && this.elements.dots) {
       this.querySelector('.swift-slider__dot--active').classList.remove('swift-slider__dot--active');
       this.querySelectorAll('.swift-slider__dot')[targetIndex].classList.add('swift-slider__dot--active');
     }
 
-    // Set new activeIndex and prevIndex
-    this.states.prevIndex = this.states.activeIndex;
-    this.states.activeIndex = targetIndex;
-
-    this.dispatchEvent(new CustomEvent('swift-slider:changed', { bubbles: true,
-      detail: {
-        slider: this ,
-        activeIndex: this.states.activeIndex,
-        prevIndex: this.states.prevIndex
-      }
-    }));
+    // Set new currentIndex and prevIndex
+    this.states.prevIndex = this.states.currentIndex;
+    this.states.currentIndex = targetIndex;
   }
 
   calculatePerSlide() {
@@ -115,19 +112,19 @@ class SwiftSlider extends HTMLElement {
 
     // Determine if next button is pressed
     this.elements.nextButton.addEventListener('click', () => {
-      if (this.states.activeIndex === this.elements.slides.length - 1) {
+      if (this.states.currentIndex === this.elements.slides.length - 1) {
         this.changeSlide(0);
       } else {
-        this.changeSlide(this.states.activeIndex + 1);
+        this.changeSlide(this.states.currentIndex + 1);
       }
     });
 
     // Determine if prev button is pressed
     this.elements.prevButton.addEventListener('click', () => {
-      if (this.states.activeIndex === 0) {
+      if (this.states.currentIndex === 0) {
         this.changeSlide(this.elements.slides.length - 1);
       } else {
-        this.changeSlide(this.states.activeIndex - 1);
+        this.changeSlide(this.states.currentIndex - 1);
       }
     });
   }
@@ -173,74 +170,9 @@ class SwiftSlider extends HTMLElement {
         targetIndex: index
       }
     }));
-  }
 
-  eventHandler() {
-    /* NOTE: Dots, Prev and Next button events are handled in generateDots() and generateButtons() */
-
-    // Determine if slider is hovered
-    this.addEventListener('mouseover', () => {
-      this.states.hovered = true;
-    });
-
-    // Determine if slider is not hovered
-    this.addEventListener('mouseleave', () => {
-      this.states.hovered = false;
-    });
-
-    document.addEventListener('swift-slider:goto', (e) => {
-      if (e.detail.id !== this.id) return;
-      this.changeSlide(e.detail.targetIndex, false, 'instant');
-    });
-
-    // Determine left/right arrow keypress
-    document.addEventListener('keydown', (e) => {
-      if (!this.states.hovered) return;
-
-      if (e.key === 'ArrowRight') {
-        if (this.states.activeIndex === this.elements.slides.length - 1) {
-          this.changeSlide(0);
-        } else {
-          this.changeSlide(this.states.activeIndex + 1);
-        }
-      } else if (e.key === 'ArrowLeft') {
-        if (this.states.activeIndex === 0) {
-          this.changeSlide(this.elements.slides.length - 1);
-        } else {
-          this.changeSlide(this.states.activeIndex - 1);
-        }
-      }
-    });
-
-    // loop thru slides and determine if slide is clicked
-    if (this.settings.navFor) {
-      this.classList.add('swift-slider--is-nav');
-      this.elements.slides.forEach((slide, index) => {
-        slide.setAttribute('tabindex', '0');
-        slide.setAttribute('aria-label', `Slide ${index + 1}`);
-
-        slide.addEventListener('click', () => {
-          if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
-          slide.classList.add('swift-slide--selected');
-
-          this.navHandler(index);
-        });
-
-        slide.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
-            slide.classList.add('swift-slide--selected');
-
-            this.navHandler(index);
-          }
-        });
-      });
-    }
-
-    // Determine if slide has been scrolled and debounce the user scrolling function
-    this.elements.view.addEventListener('scroll',() => {
-      this.debounce(this.determineUserScroll(), 100);
-    }, { passive: false });
+    if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
+    this.elements.slides[index].classList.add('swift-slide--selected');
   }
 
   determineUserScroll() {
@@ -257,10 +189,10 @@ class SwiftSlider extends HTMLElement {
     this.slideInterval = setInterval(() => {
       if (this.states.hovered) return;
 
-      if (this.states.activeIndex === this.elements.slides.length - 1) {
+      if (this.states.currentIndex === this.elements.slides.length - 1) {
         this.changeSlide(0);
       } else {
-        this.changeSlide(this.states.activeIndex + 1);
+        this.changeSlide(this.states.currentIndex + 1);
       }
     }, this.settings.sliderSpeed*1000); // Convert value to milliseconds
   }
@@ -280,11 +212,110 @@ class SwiftSlider extends HTMLElement {
       const callNow = immediate && !timeout;
 
       clearTimeout(timeout);
-
       timeout = setTimeout(later, wait);
 
       if (callNow) func.apply(context, args);
     };
+  }
+
+  eventHandler() {
+    /* NOTE: Dots, Prev and Next button events are handled in generateDots() and generateButtons() */
+
+    /* Hover events
+    ============================== */
+    this.addEventListener('mouseover', () => {
+      this.states.hovered = true;
+    });
+
+    this.addEventListener('mouseleave', () => {
+      this.states.hovered = false;
+    });
+
+    /* Custom events
+    ============================== */
+
+    document.addEventListener('swift-slider:goto', (e) => {
+      if (e.detail.id !== this.id) return;
+      this.changeSlide(e.detail.targetIndex, false, 'instant');
+    });
+
+    /* Keyboard events
+    ============================== */
+
+    document.addEventListener('keydown', (e) => {
+      if (!this.states.hovered) return;
+
+      if (e.key === 'ArrowRight') {
+        if (this.states.currentIndex === this.elements.slides.length - 1) {
+          this.changeSlide(0);
+        } else {
+          this.changeSlide(this.states.currentIndex + 1);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (this.states.currentIndex === 0) {
+          this.changeSlide(this.elements.slides.length - 1);
+        } else {
+          this.changeSlide(this.states.currentIndex - 1);
+        }
+      }
+    });
+
+    /* Navigation slide events
+    ============================== */
+
+    if (this.settings.navFor) {
+      this.classList.add('swift-slider--is-nav');
+      this.elements.slides.forEach((slide, index) => {
+        slide.setAttribute('tabindex', '0');
+        slide.setAttribute('aria-label', `Slide ${index + 1}`);
+
+        slide.addEventListener('click', () => {
+          this.navHandler(index);
+        });
+
+        slide.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            this.navHandler(index);
+          }
+        });
+      });
+    }
+
+    /* Slide change events
+    ============================== */
+
+    this.elements.view.addEventListener('scroll', () => {
+      if (this.states.scrolling) return;
+      this.states.scrolling = true;
+      this.dispatchEvent(new CustomEvent('swift-slider:change', { bubbles: true,
+        detail: {
+          slider: this
+        }
+      }));
+    });
+
+    this.elements.view.addEventListener('scrollend', () => {
+      if (!this.states.scrolling) return;
+      this.states.scrolling = false;
+      this.dispatchEvent(new CustomEvent('swift-slider:settle', { bubbles: true,
+        detail: {
+          slider: this,
+          currentIndex: this.states.currentIndex,
+          prevIndex: this.states.prevIndex
+        }
+      }));
+    }, { passive: false });
+
+    this.elements.view.addEventListener('scroll',() => {
+      this.debounce(this.determineUserScroll(), 100);
+    }, { passive: false });
+
+    if (this.settings.navFor) {
+      document.addEventListener('swift-slider:settle', (e) => {
+        if (e.detail.slider.id !== this.settings.navFor) return;
+        this.navHandler(e.detail.currentIndex);
+      });
+    }
   }
 }
 

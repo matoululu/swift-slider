@@ -52,8 +52,8 @@ As you may have noticed in the example above you can use a few attributes to set
 
 ## Events
 
-| Event                   	| description                                        	| details                           	|
-|-------------------------	|----------------------------------------------------	|-----------------------------------	|
-| swift-slider:changed     	| Emits. Emitted when the current slide has changed. 	| previousIndex, targetIndex, slider 	|
-| swift-slider:ready 	| Emits. Emitted when the slide has initially loaded 	| N/A                               	|
-| swift-slider:goto        	| Listens. Used to specifically set current slide     	| targetIndex, id                             	|
+Coming soon (sorry 😓)
+
+## Navigation slider
+
+Coming soon (sorry 😓)
