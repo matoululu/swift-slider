@@ -1,26 +1,26 @@
 :root {
-  --snapSliderViewHeight: auto;
-  --snapSliderVerticalHeight: 800px;
-  --snapSliderButtonBackground: #fff;
-  --snapSliderButtonColor: #000;
-  --snapSliderTransitionDuration: 0.15s;
-  --snapSliderHoverBrightness: 0.7;
+  --swiftSliderViewHeight: auto;
+  --swiftSliderVerticalHeight: 800px;
+  --swiftSliderButtonBackground: #fff;
+  --swiftSliderButtonColor: #000;
+  --swiftSliderTransitionDuration: 0.15s;
+  --swiftSliderHoverBrightness: 0.7;
 }
 
-snap-slider {
+swift-slider {
   display: block;
   position: relative;
 }
 
-.snap-slider__view {
+.swift-slider__view {
   display: flex;
   overflow-x: scroll;
   scroll-snap-type: x mandatory;
   width: 100%;
-  height: var(--snapSliderViewHeight);
+  height: var(--swiftSliderViewHeight);
 }
 
-.snap-slide {
+.swift-slide {
   min-width: 100%;
   height: 100%;
   scroll-snap-align: start;
@@ -30,28 +30,28 @@ snap-slider {
 /* Vertical styling
 ========================*/
 
-[data-slider-direction="vertical"] .snap-slider__view {
+[data-slider-direction="vertical"] .swift-slider__view {
   scroll-snap-type: y mandatory;
   flex-direction: column;
   overflow-y: scroll;
   overflow-x: hidden;
   width: initial;
-  height: var(--snapSliderVerticalHeight);
+  height: var(--swiftSliderVerticalHeight);
 }
 
 @media only screen and (max-width: 768px) {
-  [data-slider-direction="vertical"]  .snap-slider__view {
-    height: calc(var(--snapSliderVerticalHeight) / 2);
+  [data-slider-direction="vertical"]  .swift-slider__view {
+    height: calc(var(--swiftSliderVerticalHeight) / 2);
   }
 }
 
-[data-slider-direction="vertical"] .snap-slide {
+[data-slider-direction="vertical"] .swift-slide {
   min-width: initial;
   min-height: 100%;
   width: 100%;
 }
 
-.snap-slider__buttons {
+.swift-slider__buttons {
   position: absolute;
   width: 100%;
   top: 50%;
@@ -60,9 +60,9 @@ snap-slider {
   z-index: 1;
 }
 
-.snap-slider__button {
-  background-color: var(--snapSliderButtonBackground);
-  color: var(--snapSliderButtonColor);
+.swift-slider__button {
+  background-color: var(--swiftSliderButtonBackground);
+  color: var(--swiftSliderButtonColor);
   padding: 1rem;
   border-radius: 50%;
   border: none;
@@ -73,28 +73,28 @@ snap-slider {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: filter var(--snapSliderTransitionDuration) ease-in-out;
+  transition: filter var(--swiftSliderTransitionDuration) ease-in-out;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
 }
 
-.snap-slider__button:hover,
-.snap-slider__button:focus,
-.snap-slider__dot:hover,
-.snap-slider__dot:focus {
-  filter: var(--snapSliderHoverBrightness);
+.swift-slider__button:hover,
+.swift-slider__button:focus,
+.swift-slider__dot:hover,
+.swift-slider__dot:focus {
+  filter: var(--swiftSliderHoverBrightness);
 }
 
-.snap-slider__button[data-button-prev] {
+.swift-slider__button[data-button-prev] {
   left: 10px;
 }
 
-.snap-slider__button[data-button-next] {
+.swift-slider__button[data-button-next] {
   right: 10px;
 }
 
-.snap-slider__dots {
+.swift-slider__dots {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -107,19 +107,19 @@ snap-slider {
   margin: 0;
 }
 
-.snap-slider__dot {
+.swift-slider__dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: var(--snapSliderButtonBackground);
+  background-color: var(--swiftSliderButtonBackground);
   margin: 0 5px;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  opacity: var(--snapSliderHoverBrightness);
+  opacity: var(--swiftSliderHoverBrightness);
 }
 
-.snap-slider__dot--active {
+.swift-slider__dot--active {
   opacity: 1;
 }

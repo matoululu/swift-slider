@@ -1,10 +1,10 @@
-class SnapSlider extends HTMLElement {
+class SwiftSlider extends HTMLElement {
   constructor() {
     super();
 
     this.elements = {
-      view:  this.querySelector('.snap-slider__view'),
-      slides: this.querySelectorAll('.snap-slide'),
+      view:  this.querySelector('.swift-slider__view'),
+      slides: this.querySelectorAll('.swift-slide'),
       dots: null,
       nextButton: null,
       prevButton: null
@@ -20,7 +20,7 @@ class SnapSlider extends HTMLElement {
       perSlide: Number(this.dataset.perSlide ? this.dataset.perSlide : 1), // How many slides per view
       initialSlide: Number(this.dataset.initialSlide ? this.dataset.initialSlide : 0), // The initial slide to display
       sliderDirection: this.dataset.sliderDirection ? this.dataset.sliderDirection : 'horizontal', // Horizontal or vertical
-      slideSpeed: Number(this.dataset.slideSpeed ? this.dataset.slideSpeed : 0), //Speed of slider in seconds (0 = disabled)
+      sliderSpeed: Number(this.dataset.sliderSpeed ? this.dataset.sliderSpeed : 0), //Speed of slider in seconds (0 = disabled)
       showButtons: this.dataset.showButtons, // Show or hide buttons
       showDots: this.dataset.showDots // Show or hide dots
     }
@@ -32,10 +32,10 @@ class SnapSlider extends HTMLElement {
     this.generateButtons();
     this.generateDots();
     this.eventHandler();
-    if (this.settings.slideSpeed !== 0) this.setSlideSpeed();
+    if (this.settings.sliderSpeed !== 0) this.setSlideSpeed();
 
     // Emit event when slider is ready
-    this.dispatchEvent(new CustomEvent('snap-slider:ready', { bubbles: true, detail: { slider: this } }));
+    this.dispatchEvent(new CustomEvent('swift-slider:ready', { bubbles: true, detail: { slider: this } }));
   }
 
   changeSlide(targetIndex, skipScroll = false, behavior = 'smooth') {
@@ -56,15 +56,15 @@ class SnapSlider extends HTMLElement {
 
     // Set active dot
     if (this.settings.showDots === 'true' && this.elements.dots) {
-      this.querySelector('.snap-slider__dot--active').classList.remove('snap-slider__dot--active');
-      this.querySelectorAll('.snap-slider__dot')[targetIndex].classList.add('snap-slider__dot--active');
+      this.querySelector('.swift-slider__dot--active').classList.remove('swift-slider__dot--active');
+      this.querySelectorAll('.swift-slider__dot')[targetIndex].classList.add('swift-slider__dot--active');
     }
 
     // Set new activeIndex and prevIndex
     this.states.prevIndex = this.states.activeIndex;
     this.states.activeIndex = targetIndex;
 
-    this.dispatchEvent(new CustomEvent('snap-slider:changed', { bubbles: true,
+    this.dispatchEvent(new CustomEvent('swift-slider:changed', { bubbles: true,
       detail: {
         slider: this ,
         activeIndex: this.states.activeIndex,
@@ -91,17 +91,17 @@ class SnapSlider extends HTMLElement {
     if (this.settings.showButtons === 'false') return;
 
     const buttons = document.createElement('div');
-    buttons.classList.add('snap-slider__buttons');
+    buttons.classList.add('swift-slider__buttons');
 
     const prevButton = document.createElement('button');
-    prevButton.classList.add('snap-slider__button');
+    prevButton.classList.add('swift-slider__button');
     prevButton.dataset.buttonPrev = '';
     prevButton.innerHTML = '&larr;';
     prevButton.setAttribute('aria-label', 'Previous');
     buttons.appendChild(prevButton);
 
     const nextButton = document.createElement('button');
-    nextButton.classList.add('snap-slider__button');
+    nextButton.classList.add('swift-slider__button');
     nextButton.dataset.buttonNext = '';
     nextButton.innerHTML = '&rarr;';
     nextButton.setAttribute('aria-label', 'Next');
@@ -135,12 +135,12 @@ class SnapSlider extends HTMLElement {
     if (this.settings.showDots === 'false') return;
 
     const dots = document.createElement('ul');
-    dots.classList.add('snap-slider__dots');
+    dots.classList.add('swift-slider__dots');
 
     this.elements.slides.forEach((slide, index) => {
       const dot = document.createElement('li');
-      dot.classList.add('snap-slider__dot');
-      if (index === this.settings.initialSlide) dot.classList.add('snap-slider__dot--active');
+      dot.classList.add('swift-slider__dot');
+      if (index === this.settings.initialSlide) dot.classList.add('swift-slider__dot--active');
       dot.setAttribute('tabindex', '0');
       dot.setAttribute('aria-label', `Slide ${index + 1}`);
       dots.appendChild(dot);
@@ -177,7 +177,7 @@ class SnapSlider extends HTMLElement {
       this.states.hovered = false;
     });
 
-    this.addEventListener('snap-slider:goto', (e) => {
+    this.addEventListener('swift-slider:goto', (e) => {
       if (!e.detail.id == this.id) return;
       this.changeSlide(e.detail.targetIndex, 'instant');
     });
@@ -226,7 +226,7 @@ class SnapSlider extends HTMLElement {
       } else {
         this.changeSlide(this.states.activeIndex + 1);
       }
-    }, this.settings.slideSpeed*1000); // Convert value to milliseconds
+    }, this.settings.sliderSpeed*1000); // Convert value to milliseconds
   }
 
   debounce(func, wait, immediate) {
@@ -252,4 +252,4 @@ class SnapSlider extends HTMLElement {
   }
 }
 
-customElements.define('snap-slider', SnapSlider);
+customElements.define('swift-slider', SwiftSlider);

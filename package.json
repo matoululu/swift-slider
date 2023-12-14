@@ -1,14 +1,14 @@
 {
-  "name": "snap-slides",
-  "version": "1.0.1",
+  "name": "swift-slider",
+  "version": "1.0.2",
   "description": "A modern way to make a slideshow",
-  "main": "snap-slides.js",
+  "main": "swift-slider.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/matoululu/snap-slides.git"
+    "url": "git+https://github.com/matoululu/swift-slider.git"
   },
   "keywords": [
     "slideshow",
