@@ -5,11 +5,16 @@
   --swiftSliderButtonColor: #000;
   --swiftSliderTransitionDuration: 0.15s;
   --swiftSliderHoverBrightness: 0.7;
+  --swiftSlideSelectedBorder: rgba(255, 255, 255, 0.5);
 }
 
 swift-slider {
   display: block;
   position: relative;
+}
+
+.swift-slider--is-nav .swift-slide {
+  cursor: pointer;
 }
 
 .swift-slider__view {
@@ -18,14 +23,25 @@ swift-slider {
   scroll-snap-type: x mandatory;
   width: 100%;
   height: var(--swiftSliderViewHeight);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+  }
 }
 
 .swift-slide {
   min-width: 100%;
-  height: calc(100% - 2rem);
+  height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   padding: 1rem;
+  box-sizing: border-box;
+}
+
+.swift-slide--selected {
+  border: 5px solid var(--swiftSlideSelectedBorder);
 }
 
 /* Vertical styling

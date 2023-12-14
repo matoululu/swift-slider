@@ -21,9 +21,9 @@ class SwiftSlider extends HTMLElement {
       initialSlide: Number(this.dataset.initialSlide ? this.dataset.initialSlide : 0), // The initial slide to display
       sliderDirection: this.dataset.sliderDirection ? this.dataset.sliderDirection : 'horizontal', // Horizontal or vertical
       sliderSpeed: Number(this.dataset.sliderSpeed ? this.dataset.sliderSpeed : 0), //Speed of slider in seconds (0 = disabled)
-      showButtons: this.dataset.showButtons, // Show or hide buttons
-      showDots: this.dataset.showDots, // Show or hide dots
-      navFor: this.dataset.navFor // ID of slider to sync with
+      showButtons: this.dataset.showButtons ? this.dataset.showButtons : 'false', // Show or hide buttons
+      showDots: this.dataset.showDots ? this.dataset.showDots : 'false', // Show or hide dots
+      navFor: this.dataset.navFor ? this.dataset.navFor : null // ID of slider to sync with
     }
   }
 
@@ -188,9 +188,9 @@ class SwiftSlider extends HTMLElement {
       this.states.hovered = false;
     });
 
-    this.addEventListener('swift-slider:goto', (e) => {
-      if (!e.detail.id == this.id) return;
-      this.changeSlide(e.detail.targetIndex, 'instant');
+    document.addEventListener('swift-slider:goto', (e) => {
+      if (e.detail.id !== this.id) return;
+      this.changeSlide(e.detail.targetIndex, false, 'instant');
     });
 
     // Determine left/right arrow keypress
@@ -213,12 +213,17 @@ class SwiftSlider extends HTMLElement {
     });
 
     // loop thru slides and determine if slide is clicked
-    this.elements.slides.forEach((slide, index) => {
-      if (!this.settings.navFor) return;
-      slide.addEventListener('click', () => {
-        this.navHandler(index);
+    if (this.settings.navFor) {
+      this.classList.add('swift-slider--is-nav');
+      this.elements.slides.forEach((slide, index) => {
+        slide.addEventListener('click', () => {
+          if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
+          slide.classList.add('swift-slide--selected');
+
+          this.navHandler(index);
+        });
       });
-    });
+    }
 
     // Determine if slide has been scrolled and debounce the user scrolling function
     this.elements.view.addEventListener('scroll',() => {
