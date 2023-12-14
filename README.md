@@ -1,4 +1,4 @@
-# speedy-slider
+# swift-slider
 A modern way to make slideshows
 
 ## Demo
@@ -8,44 +8,44 @@ https://codepen.io/matouio/pen/qBgGpGd?editors=1010
 
 ### NPM package
 
-1.  Install the package `npm i speedy-slider`
+1.  Install the package `npm i swift-slider`
 2.  Import it into JS
 ```
-import SpeedySlides from 'speedy-slider';
-import SpeedyStyles from 'speedy-slider/speedy-slider.css';
+import SpeedySlides from 'swift-slider';
+import SpeedyStyles from 'swift-slider/swift-slider.css';
 ```
 
 ### CDN
 ```
-<link rel="stylesheet" href="https://unpkg.com/speedy-slider@latest/speedy-slider.css">
-<script src="https://unpkg.com/speedy-slider@latest/speedy-slider.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/swift-slider@latest/swift-slider.css">
+<script src="https://unpkg.com/swift-slider@latest/swift-slider.js"></script>
 ```
 
 ## Getting started
 
-1. Ensure the speedy-slider `.css` and `.js` files are included in you project.
-2. speedy-slider is set up using a custom HTML element, a wrapper and a group of slides. A basic example of this can be seen below. (The data attributes in the example below are optional and can be removed if you wish to use the default settings)
+1. Ensure the swift-slider `.css` and `.js` files are included in you project.
+2. swift-slider is set up using a custom HTML element, a wrapper and a group of slides. A basic example of this can be seen below. (The data attributes in the example below are optional and can be removed if you wish to use the default settings)
 
 ```html
-<speedy-slider
+<swift-slider
   id="mySlider"
   data-per-slide="1"
   data-initial-slide="0"
-  data-slide-direction="horizontal"
-  data-slide-speed="0"
+  data-slider-direction="horizontal"
+  data-slider-speed="0"
   data-show-buttons="false"
   data-show-dots="false"
 >
-  <div class="speedy-slider__view">
-    <div class="speedy-slide">Example slide 1</div>
-    <div class="speedy-slide">Example slide 2</div>
-    <div class="speedy-slide">Example slide 3</div>
-    <div class="speedy-slide">Example slide 4</div>
+  <div class="swift-slider__view">
+    <div class="swift-slide">Example slide 1</div>
+    <div class="swift-slide">Example slide 2</div>
+    <div class="swift-slide">Example slide 3</div>
+    <div class="swift-slide">Example slide 4</div>
   </div>
-</speedy-slider>
+</swift-slider>
 ```
 
-3. When a `<speedy-slider>` element is detected on the page the slider will initialize itself automatically.
+3. When a `<swift-slider>` element is detected on the page the slider will initialize itself automatically.
 
 ## Settings
 As you may have noticed in the example above you can use a few attributes to set up slider options.
@@ -54,6 +54,6 @@ As you may have noticed in the example above you can use a few attributes to set
 
 | Event                   	| description                                        	| details                           	|
 |-------------------------	|----------------------------------------------------	|-----------------------------------	|
-| speedy-slider:changed     	| Emits. Emitted when the current slide has changed. 	| previousIndex, targetIndex, slider 	|
-| speedy-slider:ready 	| Emits. Emitted when the slide has initially loaded 	| N/A                               	|
-| speedy-slider:goto        	| Listens. Used to specifically set current slide     	| targetIndex, id                             	|
+| swift-slider:changed     	| Emits. Emitted when the current slide has changed. 	| previousIndex, targetIndex, slider 	|
+| swift-slider:ready 	| Emits. Emitted when the slide has initially loaded 	| N/A                               	|
+| swift-slider:goto        	| Listens. Used to specifically set current slide     	| targetIndex, id                             	|
