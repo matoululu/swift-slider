@@ -151,9 +151,9 @@ class SwiftSlider extends HTMLElement {
         this.changeSlide(index);
       });
 
-      // Determine if spacebar is pressed on dot
+      // Determine if enter is pressed on dot
       dot.addEventListener('keydown', (e) => {
-        if (e.key === ' ') {
+        if (e.key === 'Enter') {
           this.changeSlide(index);
         }
       });
@@ -216,11 +216,23 @@ class SwiftSlider extends HTMLElement {
     if (this.settings.navFor) {
       this.classList.add('swift-slider--is-nav');
       this.elements.slides.forEach((slide, index) => {
+        slide.setAttribute('tabindex', '0');
+        slide.setAttribute('aria-label', `Slide ${index + 1}`);
+
         slide.addEventListener('click', () => {
           if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
           slide.classList.add('swift-slide--selected');
 
           this.navHandler(index);
+        });
+
+        slide.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
+            slide.classList.add('swift-slide--selected');
+
+            this.navHandler(index);
+          }
         });
       });
     }

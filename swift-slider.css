@@ -15,6 +15,12 @@ swift-slider {
 
 .swift-slider--is-nav .swift-slide {
   cursor: pointer;
+  transition: filter var(--swiftSliderTransitionDuration) ease-in-out;
+
+  &:hover,
+  &:focus {
+    filter: brightness(var(--swiftSliderHoverBrightness));
+  }
 }
 
 .swift-slider__view {
