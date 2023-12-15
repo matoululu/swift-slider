@@ -68,12 +68,6 @@ class SwiftSlider extends HTMLElement {
       this.querySelectorAll('.swift-slider__dot')[targetIndex].classList.add('swift-slider__dot--active');
     }
 
-    // Set active slide if navFor is set
-    if (this.settings.navFor) {
-      if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
-      this.elements.slides[targetIndex].classList.add('swift-slide--selected');
-    }
-
     // Set new currentIndex and prevIndex
     this.states.prevIndex = this.states.currentIndex;
     this.states.currentIndex = targetIndex;
@@ -171,6 +165,7 @@ class SwiftSlider extends HTMLElement {
   }
 
   navHandler(index) {
+    index = Number(index);
     this.dispatchEvent(new CustomEvent('swift-slider:goto', {
       bubbles: true,
       detail: {
@@ -178,6 +173,10 @@ class SwiftSlider extends HTMLElement {
         targetIndex: index
       }
     }));
+
+    // Set active slide if navFor is set
+    if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
+    this.elements.slides[index].classList.add('swift-slide--selected');
   }
 
   determineUserScroll() {
@@ -250,7 +249,7 @@ class SwiftSlider extends HTMLElement {
     ============================== */
 
     document.addEventListener('swift-slider:goto', (e) => {
-      if (e.detail.id !== this.settings.navFor) return;
+      if (e.detail.id !== this.id) return;
       this.changeSlide(e.detail.targetIndex, false, 'instant');
     });
 
