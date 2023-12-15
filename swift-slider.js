@@ -46,6 +46,8 @@ class SwiftSlider extends HTMLElement {
   }
 
   changeSlide(targetIndex, skipScroll = false, behavior = 'smooth') {
+    targetIndex = Number(targetIndex);
+
     if (!skipScroll) {
       if (this.settings.sliderDirection === 'horizontal') {
         this.elements.view.scrollTo({
@@ -62,8 +64,14 @@ class SwiftSlider extends HTMLElement {
 
     // Set active dot
     if (this.settings.showDots === 'true' && this.elements.dots) {
-      this.querySelector('.swift-slider__dot--active').classList.remove('swift-slider__dot--active');
+      if (this.querySelector('.swift-slider__dot--active')) this.querySelector('.swift-slider__dot--active').classList.remove('swift-slider__dot--active');
       this.querySelectorAll('.swift-slider__dot')[targetIndex].classList.add('swift-slider__dot--active');
+    }
+
+    // Set active slide if navFor is set
+    if (this.settings.navFor) {
+      if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
+      this.elements.slides[targetIndex].classList.add('swift-slide--selected');
     }
 
     // Set new currentIndex and prevIndex
@@ -110,21 +118,21 @@ class SwiftSlider extends HTMLElement {
 
     this.appendChild(buttons);
 
-    // Determine if next button is pressed
-    this.elements.nextButton.addEventListener('click', () => {
-      if (this.states.currentIndex === this.elements.slides.length - 1) {
-        this.changeSlide(0);
-      } else {
-        this.changeSlide(this.states.currentIndex + 1);
-      }
-    });
-
     // Determine if prev button is pressed
     this.elements.prevButton.addEventListener('click', () => {
       if (this.states.currentIndex === 0) {
         this.changeSlide(this.elements.slides.length - 1);
       } else {
         this.changeSlide(this.states.currentIndex - 1);
+      }
+    });
+
+    // Determine if next button is pressed
+    this.elements.nextButton.addEventListener('click', () => {
+      if (this.states.currentIndex === this.elements.slides.length - 1) {
+        this.changeSlide(0);
+      } else {
+        this.changeSlide(this.states.currentIndex + 1);
       }
     });
   }
@@ -170,18 +178,25 @@ class SwiftSlider extends HTMLElement {
         targetIndex: index
       }
     }));
-
-    if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
-    this.elements.slides[index].classList.add('swift-slide--selected');
   }
 
   determineUserScroll() {
-    if (this.elements.view.scrollLeft === 0) { // We're at the start of the slider
-      this.changeSlide(0, true);
-    } else if (this.elements.view.scrollLeft === this.elements.view.scrollWidth) { // We're at the end of the slider
-      this.changeSlide(this.elements.slides.length - 1, true);
-    } else { // Figure out where we are in the slider
-      this.changeSlide(Math.round(this.elements.view.scrollLeft / this.elements.slides[0].offsetWidth), true)
+    if (this.settings.sliderDirection === 'horizontal') {
+      if (this.elements.view.scrollLeft === 0) { // We're at the start of the slider
+        this.changeSlide(0, true);
+      } else if (this.elements.view.scrollLeft === this.elements.view.scrollWidth) { // We're at the end of the slider
+        this.changeSlide(this.elements.slides.length - 1, true);
+      } else { // Figure out where we are in the slider
+        this.changeSlide(Math.round(this.elements.view.scrollLeft / this.elements.slides[0].offsetWidth), true)
+      }
+    } else {
+      if (this.elements.view.scrollTop === 0) { // We're at the start of the slider
+        this.changeSlide(0, true);
+      } else if (this.elements.view.scrollTop === this.elements.view.scrollHeight) { // We're at the end of the slider
+        this.changeSlide(this.elements.slides.length - 1, true);
+      } else { // Figure out where we are in the slider
+        this.changeSlide(Math.round(this.elements.view.scrollTop / this.elements.slides[0].offsetHeight), true)
+      }
     }
   }
 
@@ -235,7 +250,7 @@ class SwiftSlider extends HTMLElement {
     ============================== */
 
     document.addEventListener('swift-slider:goto', (e) => {
-      if (e.detail.id !== this.id) return;
+      if (e.detail.id !== this.settings.navFor) return;
       this.changeSlide(e.detail.targetIndex, false, 'instant');
     });
 

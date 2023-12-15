@@ -42,7 +42,6 @@ swift-slider {
   height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  padding: 1rem;
   box-sizing: border-box;
 }
 
@@ -73,6 +72,37 @@ swift-slider {
   min-height: 100%;
   width: 100%;
 }
+
+[data-slider-direction="vertical"] .swift-slider__buttons {
+  height: 100%;
+}
+
+[data-slider-direction="vertical"] .swift-slider__button {
+  left: 50%;
+  transform: translateX(-50%);
+  transform: translateX(-50%) rotate(90deg);
+}
+
+[data-slider-direction="vertical"] .swift-slider__button[data-button-prev] {
+  top: 10px;
+}
+
+[data-slider-direction="vertical"] .swift-slider__button[data-button-next] {
+  bottom: 10px;
+  top: initial;
+}
+
+[data-slider-direction="vertical"] .swift-slider__dots {
+  flex-direction: column;
+  left: 10px;
+  align-items: flex-start;
+  width: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Controls styling
+========================*/
 
 .swift-slider__buttons {
   position: absolute;
@@ -136,7 +166,7 @@ swift-slider {
   height: 10px;
   border-radius: 50%;
   background-color: var(--swiftSliderButtonBackground);
-  margin: 0 5px;
+  margin: 5px;
   cursor: pointer;
   display: flex;
   justify-content: center;
