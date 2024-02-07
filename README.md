@@ -11,8 +11,8 @@ https://codepen.io/matouio/pen/qBgGpGd?editors=1010
 1.  Install the package `npm i swift-slider`
 2.  Import it into JS
 ```
-import SpeedySlides from 'swift-slider';
-import SpeedyStyles from 'swift-slider/swift-slider.css';
+import SwiftSlider from 'swift-slider';
+import SwiftStyles from 'swift-slider/swift-slider.css';
 ```
 
 ### CDN
