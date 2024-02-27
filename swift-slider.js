@@ -26,6 +26,8 @@ class SwiftSlider extends HTMLElement {
       showDots: this.dataset.showDots ? this.dataset.showDots : 'false', // Show or hide dots
       navFor: this.dataset.navFor ? this.dataset.navFor : null // ID of slider to sync with
     }
+
+    this.totalCalculatedSlides = Math.ceil(this.elements.slides.length / this.settings.perSlide);
   }
 
   connectedCallback() {
@@ -115,15 +117,15 @@ class SwiftSlider extends HTMLElement {
     // Determine if prev button is pressed
     this.elements.prevButton.addEventListener('click', () => {
       if (this.states.currentIndex === 0) {
-        this.changeSlide(this.elements.slides.length - 1);
+        this.changeSlide(this.totalCalculatedSlides - 1);
       } else {
-        this.changeSlide(this.states.currentIndex - 1);
+        this.changeSlide(this.totalCalculatedSlides - 1);
       }
     });
 
     // Determine if next button is pressed
     this.elements.nextButton.addEventListener('click', () => {
-      if (this.states.currentIndex === this.elements.slides.length - 1) {
+      if (this.states.currentIndex === this.totalCalculatedSlides - 1) {
         this.changeSlide(0);
       } else {
         this.changeSlide(this.states.currentIndex + 1);
@@ -137,46 +139,57 @@ class SwiftSlider extends HTMLElement {
     const dots = document.createElement('ul');
     dots.classList.add('swift-slider__dots');
 
-    this.elements.slides.forEach((slide, index) => {
+    for(let i = 0; i < this.totalCalculatedSlides; i++) {
       const dot = document.createElement('li');
       dot.classList.add('swift-slider__dot');
-      if (index === this.settings.initialSlide) dot.classList.add('swift-slider__dot--active');
+      if (i === this.settings.initialSlide) dot.classList.add('swift-slider__dot--active');
       dot.setAttribute('tabindex', '0');
-      dot.setAttribute('aria-label', `Slide ${index + 1}`);
+      dot.setAttribute('aria-label', `Slide ${i + 1}`);
       dots.appendChild(dot);
 
       // Determine if dot is pressed
       dot.addEventListener('click', () => {
-        this.changeSlide(index);
+        this.changeSlide(i);
       });
 
       // Determine if enter is pressed on dot
       dot.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-          this.changeSlide(index);
+          this.changeSlide(i);
         }
       });
 
-    });
+    }
 
     this.elements.dots = dots; // Set dots to elements
 
     this.appendChild(dots);
   }
 
-  navHandler(index) {
+  navHandler(index, el = null, skipScroll = false) {
+    console.log('-------------')
+    console.log(el);
+    console.trace();
     index = Number(index);
-    this.dispatchEvent(new CustomEvent('swift-slider:goto', {
-      bubbles: true,
-      detail: {
-        id: this.settings.navFor,
-        targetIndex: index
-      }
-    }));
+
+    if (!skipScroll) {
+      this.dispatchEvent(new CustomEvent('swift-slider:goto', {
+        bubbles: true,
+        detail: {
+          id: this.settings.navFor,
+          targetIndex: index
+        }
+      }));
+    }
 
     // Set active slide if navFor is set
     if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
-    this.elements.slides[index].classList.add('swift-slide--selected');
+
+    if (el) {
+      el.classList.add('swift-slide--selected');
+    } else {
+      this.elements.slides[index].classList.add('swift-slide--selected');
+    }
   }
 
   determineUserScroll() {
@@ -184,7 +197,7 @@ class SwiftSlider extends HTMLElement {
       if (this.elements.view.scrollLeft === 0) { // We're at the start of the slider
         this.changeSlide(0, true);
       } else if (this.elements.view.scrollLeft === this.elements.view.scrollWidth) { // We're at the end of the slider
-        this.changeSlide(this.elements.slides.length - 1, true);
+        this.changeSlide(this.totalCalculatedSlides - 1, true);
       } else { // Figure out where we are in the slider
         this.changeSlide(Math.round(this.elements.view.scrollLeft / this.elements.slides[0].offsetWidth), true)
       }
@@ -192,7 +205,7 @@ class SwiftSlider extends HTMLElement {
       if (this.elements.view.scrollTop === 0) { // We're at the start of the slider
         this.changeSlide(0, true);
       } else if (this.elements.view.scrollTop === this.elements.view.scrollHeight) { // We're at the end of the slider
-        this.changeSlide(this.elements.slides.length - 1, true);
+        this.changeSlide(this.totalCalculatedSlides - 1, true);
       } else { // Figure out where we are in the slider
         this.changeSlide(Math.round(this.elements.view.scrollTop / this.elements.slides[0].offsetHeight), true)
       }
@@ -203,7 +216,7 @@ class SwiftSlider extends HTMLElement {
     this.slideInterval = setInterval(() => {
       if (this.states.hovered) return;
 
-      if (this.states.currentIndex === this.elements.slides.length - 1) {
+      if (this.states.currentIndex === this.totalCalculatedSlides - 1) {
         this.changeSlide(0);
       } else {
         this.changeSlide(this.states.currentIndex + 1);
@@ -260,14 +273,14 @@ class SwiftSlider extends HTMLElement {
       if (!this.states.hovered) return;
 
       if (e.key === 'ArrowRight') {
-        if (this.states.currentIndex === this.elements.slides.length - 1) {
+        if (this.states.currentIndex === this.totalCalculatedSlides - 1) {
           this.changeSlide(0);
         } else {
           this.changeSlide(this.states.currentIndex + 1);
         }
       } else if (e.key === 'ArrowLeft') {
         if (this.states.currentIndex === 0) {
-          this.changeSlide(this.elements.slides.length - 1);
+          this.changeSlide(this.totalCalculatedSlides - 1);
         } else {
           this.changeSlide(this.states.currentIndex - 1);
         }
@@ -284,12 +297,20 @@ class SwiftSlider extends HTMLElement {
         slide.setAttribute('aria-label', `Slide ${index + 1}`);
 
         slide.addEventListener('click', () => {
-          this.navHandler(index);
+          if (index <= this.totalCalculatedSlides) {
+            this.navHandler(index, slide);
+          } else {
+            this.navHandler(this.totalCalculatedSlides, slide);
+          }
         });
 
         slide.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
-            this.navHandler(index);
+            if (index <= this.totalCalculatedSlides) {
+              this.navHandler(index, slide);
+            } else {
+              this.navHandler(this.totalCalculatedSlides, slide);
+            }
           }
         });
       });
@@ -327,7 +348,7 @@ class SwiftSlider extends HTMLElement {
     if (this.settings.navFor) {
       document.addEventListener('swift-slider:settle', (e) => {
         if (e.detail.slider.id !== this.settings.navFor) return;
-        this.navHandler(e.detail.currentIndex);
+        this.navHandler(e.detail.currentIndex, null, true);
       });
     }
   }
