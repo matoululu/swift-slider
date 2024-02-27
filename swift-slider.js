@@ -166,30 +166,19 @@ class SwiftSlider extends HTMLElement {
     this.appendChild(dots);
   }
 
-  navHandler(index, el = null, skipScroll = false) {
-    console.log('-------------')
-    console.log(el);
-    console.trace();
+  navHandler(index) {
     index = Number(index);
-
-    if (!skipScroll) {
-      this.dispatchEvent(new CustomEvent('swift-slider:goto', {
-        bubbles: true,
-        detail: {
-          id: this.settings.navFor,
-          targetIndex: index
-        }
-      }));
-    }
+    this.dispatchEvent(new CustomEvent('swift-slider:goto', {
+      bubbles: true,
+      detail: {
+        id: this.settings.navFor,
+        targetIndex: index
+      }
+    }));
 
     // Set active slide if navFor is set
     if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
-
-    if (el) {
-      el.classList.add('swift-slide--selected');
-    } else {
-      this.elements.slides[index].classList.add('swift-slide--selected');
-    }
+    this.elements.slides[index].classList.add('swift-slide--selected');
   }
 
   determineUserScroll() {
@@ -297,20 +286,12 @@ class SwiftSlider extends HTMLElement {
         slide.setAttribute('aria-label', `Slide ${index + 1}`);
 
         slide.addEventListener('click', () => {
-          if (index <= this.totalCalculatedSlides) {
-            this.navHandler(index, slide);
-          } else {
-            this.navHandler(this.totalCalculatedSlides, slide);
-          }
+          this.navHandler(index);
         });
 
         slide.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
-            if (index <= this.totalCalculatedSlides) {
-              this.navHandler(index, slide);
-            } else {
-              this.navHandler(this.totalCalculatedSlides, slide);
-            }
+            this.navHandler(index);
           }
         });
       });
@@ -348,7 +329,7 @@ class SwiftSlider extends HTMLElement {
     if (this.settings.navFor) {
       document.addEventListener('swift-slider:settle', (e) => {
         if (e.detail.slider.id !== this.settings.navFor) return;
-        this.navHandler(e.detail.currentIndex, null, true);
+        this.navHandler(e.detail.currentIndex);
       });
     }
   }
