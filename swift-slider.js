@@ -226,6 +226,11 @@ class SwiftSlider extends HTMLElement {
   }
 
   navHandler() {
+    if (this.settings.perFrame !== 1) {
+      console.error('Swift slider: Navigation is not supported with perFrame greater than 1');
+      return; // Navigation is not supported with perFrame > 1
+    }
+
     this.elements.navItems = this.elements.navigation.children;
 
     if (this.elements.navItems.length !== this.elements.slides.length) {
