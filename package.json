@@ -1,6 +1,6 @@
 {
   "name": "swift-slider",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A modern way to make a slideshow",
   "main": "swift-slider.js",
   "scripts": {
@@ -19,5 +19,5 @@
     "simple"
   ],
   "author": "matoululu",
-  "license": "ISC"
+  "license": "MPL-2.0"
 }
