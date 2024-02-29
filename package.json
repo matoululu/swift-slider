@@ -1,6 +1,6 @@
 {
   "name": "swift-slider",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A modern way to make a slideshow",
   "main": "swift-slider.js",
   "scripts": {
