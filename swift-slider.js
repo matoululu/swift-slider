@@ -7,8 +7,7 @@ class SwiftSlider extends HTMLElement {
       slides: this.querySelectorAll('.swift-slide'),
       dots: null,
       nextButton: null,
-      prevButton: null
-    }
+      prevButton: null    }
 
     this.states = {
       hovered: false, // Is the user hovering over the slideshow
@@ -18,30 +17,26 @@ class SwiftSlider extends HTMLElement {
     }
 
     this.settings = {
-      perSlide: Number(this.dataset.perSlide ? this.dataset.perSlide : 1), // How many slides per view
+      perFrame: Number(this.dataset.perFrame ? this.dataset.perFrame : 1), // How many slides per view
       initialSlide: Number(this.dataset.initialSlide ? this.dataset.initialSlide : 0), // The initial slide to display
       sliderDirection: this.dataset.sliderDirection ? this.dataset.sliderDirection : 'horizontal', // Horizontal or vertical
       sliderSpeed: Number(this.dataset.sliderSpeed ? this.dataset.sliderSpeed : 0), //Speed of slider in seconds (0 = disabled)
       showButtons: this.dataset.showButtons ? this.dataset.showButtons : 'false', // Show or hide buttons
-      showDots: this.dataset.showDots ? this.dataset.showDots : 'false', // Show or hide dots
-      navFor: this.dataset.navFor ? this.dataset.navFor : null // ID of slider to sync with
+      showDots: this.dataset.showDots ? this.dataset.showDots : 'false' // Show or hide dots
     }
-
-    this.totalCalculatedSlides = Math.ceil(this.elements.slides.length / this.settings.perSlide);
   }
 
   connectedCallback() {
     this.changeSlide(this.settings.initialSlide, false, 'instant');
-    this.calculatePerSlide();
-    this.generateButtons();
-    this.generateDots();
+    this.calculatePerFrame();
+
+    if (this.elements.slides.length > this.settings.perFrame) {
+      this.generateButtons();
+      this.generateDots();
+    }
+
     this.eventHandler();
     if (this.settings.sliderSpeed !== 0) this.setSlideSpeed();
-
-    if (this.settings.navFor) {
-      const navIndex = document.querySelector(`#${this.settings.navFor}`).dataset.initialSlide;
-      this.navHandler(navIndex);
-    }
 
     // Emit event when slider is ready
     this.dispatchEvent(new CustomEvent('swift-slider:ready', { bubbles: true, detail: { slider: this } }));
@@ -75,16 +70,16 @@ class SwiftSlider extends HTMLElement {
     this.states.currentIndex = targetIndex;
   }
 
-  calculatePerSlide() {
-    if (this.settings.perSlide === 1) return;
+  calculatePerFrame() {
+    if (this.settings.perFrame === 1) return;
 
     if (this.settings.sliderDirection === 'horizontal') {
       this.elements.slides.forEach(slide => {
-        slide.style = `width: ${100 / this.settings.perSlide}%; min-width: ${100 / this.settings.perSlide}%;`;
+        slide.style = `width: ${100 / this.settings.perFrame}%; min-width: ${100 / this.settings.perFrame}%;`;
       });
     } else {
       this.elements.slides.forEach(slide => {
-        slide.style = `height: ${100 / this.settings.perSlide}%; min-height: ${100 / this.settings.perSlide}%;`;
+        slide.style = `height: ${100 / this.settings.perFrame}%; min-height: ${100 / this.settings.perFrame}%;`;
       });
     }
   }
@@ -117,15 +112,15 @@ class SwiftSlider extends HTMLElement {
     // Determine if prev button is pressed
     this.elements.prevButton.addEventListener('click', () => {
       if (this.states.currentIndex === 0) {
-        this.changeSlide(this.totalCalculatedSlides - 1);
+        this.changeSlide(this.elements.slides.length - 1);
       } else {
-        this.changeSlide(this.totalCalculatedSlides - 1);
+        this.changeSlide(this.states.currentIndex - 1);
       }
     });
 
     // Determine if next button is pressed
     this.elements.nextButton.addEventListener('click', () => {
-      if (this.states.currentIndex === this.totalCalculatedSlides - 1) {
+      if (this.states.currentIndex === this.elements.slides.length - 1) {
         this.changeSlide(0);
       } else {
         this.changeSlide(this.states.currentIndex + 1);
@@ -134,6 +129,12 @@ class SwiftSlider extends HTMLElement {
   }
 
   generateDots() {
+    if (this.settings.perFrame === 1) {
+      this.totalCalculatedSlides = this.elements.slides.length;
+    } else {
+      this.totalCalculatedSlides = (Math.floor(this.elements.slides.length / this.settings.perFrame) + 1);
+    }
+
     if (this.settings.showDots === 'false') return;
 
     const dots = document.createElement('ul');
@@ -158,27 +159,11 @@ class SwiftSlider extends HTMLElement {
           this.changeSlide(i);
         }
       });
-
     }
 
     this.elements.dots = dots; // Set dots to elements
 
     this.appendChild(dots);
-  }
-
-  navHandler(index) {
-    index = Number(index);
-    this.dispatchEvent(new CustomEvent('swift-slider:goto', {
-      bubbles: true,
-      detail: {
-        id: this.settings.navFor,
-        targetIndex: index
-      }
-    }));
-
-    // Set active slide if navFor is set
-    if (this.querySelector('.swift-slide--selected')) this.querySelector('.swift-slide--selected').classList.remove('swift-slide--selected');
-    this.elements.slides[index].classList.add('swift-slide--selected');
   }
 
   determineUserScroll() {
@@ -276,27 +261,6 @@ class SwiftSlider extends HTMLElement {
       }
     });
 
-    /* Navigation slide events
-    ============================== */
-
-    if (this.settings.navFor) {
-      this.classList.add('swift-slider--is-nav');
-      this.elements.slides.forEach((slide, index) => {
-        slide.setAttribute('tabindex', '0');
-        slide.setAttribute('aria-label', `Slide ${index + 1}`);
-
-        slide.addEventListener('click', () => {
-          this.navHandler(index);
-        });
-
-        slide.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            this.navHandler(index);
-          }
-        });
-      });
-    }
-
     /* Slide change events
     ============================== */
 
@@ -325,13 +289,6 @@ class SwiftSlider extends HTMLElement {
     this.elements.view.addEventListener('scroll',() => {
       this.debounce(this.determineUserScroll(), 100);
     }, { passive: false });
-
-    if (this.settings.navFor) {
-      document.addEventListener('swift-slider:settle', (e) => {
-        if (e.detail.slider.id !== this.settings.navFor) return;
-        this.navHandler(e.detail.currentIndex);
-      });
-    }
   }
 }
 
