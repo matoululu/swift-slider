@@ -7,7 +7,9 @@ class SwiftSlider extends HTMLElement {
       slides: this.querySelectorAll('.swift-slide'),
       dots: null,
       nextButton: null,
-      prevButton: null    }
+      prevButton: null,
+      navigation: document.querySelector(`[data-swift-nav-for="${this.id}"]`) ? document.querySelector(`[data-swift-nav-for="${this.id}"]`) : null
+    }
 
     this.states = {
       hovered: false, // Is the user hovering over the slideshow
@@ -33,6 +35,10 @@ class SwiftSlider extends HTMLElement {
     if (this.elements.slides.length > this.settings.perFrame) {
       this.generateButtons();
       this.generateDots();
+    }
+
+    if (this.elements.navigation) {
+      this.navHandler();
     }
 
     this.eventHandler();
@@ -217,6 +223,23 @@ class SwiftSlider extends HTMLElement {
 
       if (callNow) func.apply(context, args);
     };
+  }
+
+  navHandler() {
+    const navItems = this.elements.navigation.children;
+
+    if (navItems.length !== this.elements.slides.length) {
+      console.error('Swift slider: The number of navigation items does not match the number of slides.');
+      return;
+    }
+
+    //loop through each nav item and add event listener
+    for(let i = 0; i < navItems.length; i++) {
+      navItems[i].addEventListener('click', () => {
+        this.changeSlide(i, false, 'instant');
+        navItems[i].classList.add('swift-slider--nav-active');
+      });
+    }
   }
 
   eventHandler() {
