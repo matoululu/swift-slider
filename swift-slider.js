@@ -118,7 +118,7 @@ class SwiftSlider extends HTMLElement {
     // Determine if prev button is pressed
     this.elements.prevButton.addEventListener('click', () => {
       if (this.states.currentIndex === 0) {
-        this.changeSlide(this.elements.slides.length - 1);
+        this.changeSlide(this.totalCalculatedSlides - 1);
       } else {
         this.changeSlide(this.states.currentIndex - 1);
       }
@@ -126,7 +126,7 @@ class SwiftSlider extends HTMLElement {
 
     // Determine if next button is pressed
     this.elements.nextButton.addEventListener('click', () => {
-      if (this.states.currentIndex === this.elements.slides.length - 1) {
+      if (this.states.currentIndex === this.totalCalculatedSlides - 1) {
         this.changeSlide(0);
       } else {
         this.changeSlide(this.states.currentIndex + 1);
@@ -228,6 +228,7 @@ class SwiftSlider extends HTMLElement {
   navHandler() {
     if (this.settings.perFrame !== 1) {
       console.error('Swift slider: Navigation is not supported with perFrame greater than 1');
+      this.elements.navigation = null;
       return; // Navigation is not supported with perFrame > 1
     }
 
