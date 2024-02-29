@@ -226,18 +226,26 @@ class SwiftSlider extends HTMLElement {
   }
 
   navHandler() {
-    const navItems = this.elements.navigation.children;
+    this.elements.navItems = this.elements.navigation.children;
 
-    if (navItems.length !== this.elements.slides.length) {
+    if (this.elements.navItems.length !== this.elements.slides.length) {
       console.error('Swift slider: The number of navigation items does not match the number of slides.');
+      this.elements.navigation = null;
       return;
     }
 
+    this.elements.navItems[this.states.currentIndex].classList.add('swift-slider--nav-active');
+
     //loop through each nav item and add event listener
-    for(let i = 0; i < navItems.length; i++) {
-      navItems[i].addEventListener('click', () => {
+    for(let i = 0; i < this.elements.navItems.length; i++) {
+      this.elements.navItems[i].addEventListener('click', () => {
         this.changeSlide(i, false, 'instant');
-        navItems[i].classList.add('swift-slider--nav-active');
+
+        for(let j = 0; j < this.elements.navItems.length; j++) {
+          this.elements.navItems[j].classList.remove('swift-slider--nav-active');
+        }
+
+        this.elements.navItems[i].classList.add('swift-slider--nav-active');
       });
     }
   }
@@ -312,6 +320,17 @@ class SwiftSlider extends HTMLElement {
     this.elements.view.addEventListener('scroll',() => {
       this.debounce(this.determineUserScroll(), 100);
     }, { passive: false });
+
+    if (this.elements.navigation) {
+      document.addEventListener('swift-slider:settle', (e) => {
+        if (e.detail.slider.id !== this.id) return;
+        for(let i = 0; i < this.elements.navItems.length; i++) {
+          this.elements.navItems[i].classList.remove('swift-slider--nav-active');
+        }
+
+        this.elements.navItems[e.detail.currentIndex].classList.add('swift-slider--nav-active');
+      });
+    }
   }
 }
 
