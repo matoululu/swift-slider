@@ -11,7 +11,23 @@
 swift-slider {
   display: block;
   position: relative;
+
+  &[data-slider-style="preview"] {
+    .swift-slide {
+      max-width: 66.6666%;
+      scroll-snap-align: center;
+    }
+
+    .swift-slide:last-child {
+        margin-right: 33.3333%;
+      }
+
+    .swift-slide:first-child {
+      margin-left: 33.3333%;
+    }
+  }
 }
+
 .swift-slider__view {
   display: flex;
   overflow-x: scroll;
@@ -27,7 +43,7 @@ swift-slider {
 }
 
 .swift-slide {
-  min-width: 100%;
+  min-width: 66.6666%;
   height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;

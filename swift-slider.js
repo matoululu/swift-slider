@@ -24,7 +24,8 @@ class SwiftSlider extends HTMLElement {
       sliderDirection: this.dataset.sliderDirection ? this.dataset.sliderDirection : 'horizontal', // Horizontal or vertical
       sliderSpeed: Number(this.dataset.sliderSpeed ? this.dataset.sliderSpeed : 0), //Speed of slider in seconds (0 = disabled)
       showButtons: this.dataset.showButtons ? this.dataset.showButtons : 'false', // Show or hide buttons
-      showDots: this.dataset.showDots ? this.dataset.showDots : 'false' // Show or hide dots
+      showDots: this.dataset.showDots ? this.dataset.showDots : 'false', // Show or hide dots
+      sliderStyle: this.dataset.sliderStyle ? this.dataset.sliderStyle : null // The style of slider being shown
     }
   }
 
@@ -78,6 +79,11 @@ class SwiftSlider extends HTMLElement {
 
   calculatePerFrame() {
     if (this.settings.perFrame === 1) return;
+
+    if (this.settings.sliderStyle === 'preview' && this.settings.perFrame > 1) {
+      console.error('Swift slider: Preview slider style is not compatible with multiple slides per frame.');
+      return;
+    }
 
     if (this.settings.sliderDirection === 'horizontal') {
       this.elements.slides.forEach(slide => {
