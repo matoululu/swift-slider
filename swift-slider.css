@@ -81,58 +81,6 @@ swift-slider {
   border: 5px solid var(--swiftSlideSelectedBorder);
 }
 
-/* Vertical styling
-========================*/
-
-[data-slider-direction="vertical"] .swift-slider__view {
-  scroll-snap-type: y mandatory;
-  flex-direction: column;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  width: initial;
-  height: var(--swiftSliderVerticalHeight);
-}
-
-@media only screen and (max-width: 768px) {
-  [data-slider-direction="vertical"]  .swift-slider__view {
-    height: calc(var(--swiftSliderVerticalHeight) / 2);
-  }
-}
-
-[data-slider-direction="vertical"] .swift-slide {
-  min-width: initial;
-  min-height: 100%;
-  width: 100%;
-}
-
-[data-slider-direction="vertical"] .swift-slider__buttons {
-  height: 100%;
-}
-
-[data-slider-direction="vertical"] .swift-slider__button {
-  left: 50%;
-  transform: translateX(-50%);
-  transform: translateX(-50%) rotate(90deg);
-}
-
-[data-slider-direction="vertical"] .swift-slider__button[data-button-prev] {
-  top: 10px;
-}
-
-[data-slider-direction="vertical"] .swift-slider__button[data-button-next] {
-  bottom: 10px;
-  top: initial;
-}
-
-[data-slider-direction="vertical"] .swift-slider__dots {
-  flex-direction: column;
-  left: 10px;
-  align-items: flex-start;
-  width: auto;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
 /* Controls styling
 ========================*/
 
@@ -208,4 +156,56 @@ swift-slider {
 
 .swift-slider__dot--active {
   opacity: 1;
+}
+
+/* Vertical styling
+========================*/
+
+[data-slider-direction="vertical"] .swift-slider__view {
+  scroll-snap-type: y mandatory;
+  flex-direction: column;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  width: initial;
+  height: var(--swiftSliderVerticalHeight);
+}
+
+@media only screen and (max-width: 768px) {
+  [data-slider-direction="vertical"]  .swift-slider__view {
+    height: calc(var(--swiftSliderVerticalHeight) / 2);
+  }
+}
+
+[data-slider-direction="vertical"] .swift-slide {
+  min-width: initial;
+  min-height: 100%;
+  width: 100%;
+}
+
+[data-slider-direction="vertical"] .swift-slider__buttons {
+  height: 100%;
+}
+
+[data-slider-direction="vertical"] .swift-slider__button {
+  left: 50%;
+  transform: translateX(-50%);
+  transform: translateX(-50%) rotate(90deg);
+}
+
+[data-slider-direction="vertical"] .swift-slider__button[data-button-prev] {
+  top: 10px;
+}
+
+[data-slider-direction="vertical"] .swift-slider__button[data-button-next] {
+  bottom: 10px;
+  top: initial;
+}
+
+[data-slider-direction="vertical"] .swift-slider__dots {
+  flex-direction: column;
+  left: 10px;
+  align-items: flex-start;
+  width: auto;
+  top: 50%;
+  transform: translateY(-50%);
 }
