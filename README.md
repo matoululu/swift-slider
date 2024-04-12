@@ -29,12 +29,13 @@ import SwiftStyles from 'swift-slider/swift-slider.css';
 ```html
 <swift-slider
   id="mySlider"
-  data-per-slide="1"
+  data-per-view="1"
   data-initial-slide="0"
   data-slider-direction="horizontal"
   data-slider-speed="0"
   data-show-buttons="false"
   data-show-dots="false"
+  data-slider-style="normal"
 >
   <div class="swift-slider__view">
     <div class="swift-slide">Example slide 1</div>
@@ -47,13 +48,6 @@ import SwiftStyles from 'swift-slider/swift-slider.css';
 
 3. When a `<swift-slider>` element is detected on the page the slider will initialize itself automatically.
 
-## Settings
-As you may have noticed in the example above you can use a few attributes to set up slider options.
+## Everything else
 
-## Events
-
-Coming soon (sorry 😓)
-
-## Navigation slider
-
-Coming soon (sorry 😓)
+Coming soon (I promise!)
