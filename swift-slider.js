@@ -1,3 +1,9 @@
+/* Swift Slider
+ * A modern way to make slideshows
+ * Author: matou.io
+ * License: MPL-2.0
+ */
+
 class SwiftSlider extends HTMLElement {
   constructor() {
     super();
@@ -19,7 +25,7 @@ class SwiftSlider extends HTMLElement {
     }
 
     this.settings = {
-      perFrame: Number(this.dataset.perFrame ? this.dataset.perFrame : 1), // How many slides per view
+      perView: Number(this.dataset.perView ? this.dataset.perView : 1), // How many slides per view
       initialSlide: Number(this.dataset.initialSlide ? this.dataset.initialSlide : 0), // The initial slide to display
       sliderDirection: this.dataset.sliderDirection ? this.dataset.sliderDirection : 'horizontal', // Horizontal or vertical
       sliderSpeed: Number(this.dataset.sliderSpeed ? this.dataset.sliderSpeed : 0), //Speed of slider in seconds (0 = disabled)
@@ -30,29 +36,30 @@ class SwiftSlider extends HTMLElement {
   }
 
   connectedCallback() {
+    // Display initial slide
     this.changeSlide(this.settings.initialSlide, false, 'instant');
-    this.calculatePerFrame();
 
-    if (this.elements.slides.length > this.settings.perFrame) {
-      this.generateButtons();
-      this.generateDots();
-    }
+    // Calculate slides per frame
+    this.calculatePerView();
 
-    if (this.elements.navigation) {
-      this.navHandler();
-    }
-
-    this.eventHandler();
+    // Generate buttons and dots
+    if (this.elements.slides.length > this.settings.perView) { this.generateButtons(); this.generateDots(); }
+    // Set slider speed
     if (this.settings.sliderSpeed !== 0) this.setSlideSpeed();
+    // Set up navigation
+    if (this.elements.navigation) this.navHandler();
+
+    // Set up event listeners
+    this.eventHandler();
 
     // Emit event when slider is ready
     this.dispatchEvent(new CustomEvent('swift-slider:ready', { bubbles: true, detail: { slider: this } }));
   }
 
   changeSlide(targetIndex, skipScroll = false, behavior = 'smooth') {
-    targetIndex = Number(targetIndex);
+    targetIndex = Number(targetIndex); // Ensure targetIndex is a number
 
-    if (!skipScroll) {
+    if (!skipScroll) {  // If we aren't listening for scrolling
       if (this.settings.sliderDirection === 'horizontal') {
         this.elements.view.scrollTo({
           left: this.elements.slides[targetIndex].offsetLeft,
@@ -77,27 +84,27 @@ class SwiftSlider extends HTMLElement {
     this.states.currentIndex = targetIndex;
   }
 
-  calculatePerFrame() {
-    if (this.settings.perFrame === 1) return;
+  calculatePerView() {
+    if (this.settings.perView === 1) return; // If perView is 1, we don't need to calculate anything
 
-    if (this.settings.sliderStyle === 'preview' && this.settings.perFrame > 1) {
+    if (this.settings.sliderStyle === 'preview' && this.settings.perView > 1) {
       console.error('Swift slider: Preview slider style is not compatible with multiple slides per frame.');
       return;
     }
 
-    if (this.settings.sliderDirection === 'horizontal') {
+    if (this.settings.sliderDirection === 'horizontal') { // Set width of slides based off of perView
       this.elements.slides.forEach(slide => {
-        slide.style = `width: ${100 / this.settings.perFrame}%; min-width: ${100 / this.settings.perFrame}%;`;
+        slide.style = `width: ${100 / this.settings.perView}%; min-width: ${100 / this.settings.perView}%;`;
       });
     } else {
       this.elements.slides.forEach(slide => {
-        slide.style = `height: ${100 / this.settings.perFrame}%; min-height: ${100 / this.settings.perFrame}%;`;
+        slide.style = `height: ${100 / this.settings.perView}%; min-height: ${100 / this.settings.perView}%;`;
       });
     }
   }
 
   generateButtons() {
-    if (this.settings.showButtons === 'false') return;
+    if (this.settings.showButtons === 'false') return; // If showButtons is false, don't generate buttons
 
     const buttons = document.createElement('div');
     buttons.classList.add('swift-slider__buttons');
@@ -141,13 +148,13 @@ class SwiftSlider extends HTMLElement {
   }
 
   generateDots() {
-    if (this.settings.perFrame === 1) {
-      this.totalCalculatedSlides = this.elements.slides.length;
-    } else {
-      this.totalCalculatedSlides = (Math.floor(this.elements.slides.length / this.settings.perFrame) + 1);
-    }
+    if (this.settings.showDots === 'false') return; // If showDots is false, don't generate dots
 
-    if (this.settings.showDots === 'false') return;
+    if (this.settings.perView === 1) { // If perView is 1, we don't need to calculate anything
+      this.totalCalculatedSlides = this.elements.slides.length;
+    } else { // If perView is greater than 1, we need to calculate the total number of dots to display
+      this.totalCalculatedSlides = (Math.floor(this.elements.slides.length / this.settings.perView) + 1);
+    }
 
     const dots = document.createElement('ul');
     dots.classList.add('swift-slider__dots');
@@ -232,10 +239,10 @@ class SwiftSlider extends HTMLElement {
   }
 
   navHandler() {
-    if (this.settings.perFrame !== 1) {
-      console.error('Swift slider: Navigation is not supported with perFrame greater than 1');
+    if (this.settings.perView !== 1) { // Navigation is not supported with perView > 1
+      console.error('Swift slider: Navigation is not supported with perView greater than 1');
       this.elements.navigation = null;
-      return; // Navigation is not supported with perFrame > 1
+      return;
     }
 
     this.elements.navItems = this.elements.navigation.children;

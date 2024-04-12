@@ -1,3 +1,9 @@
+/* Swift Slider
+ * A modern way to make slideshows
+ * Author: matou.io
+ * License: MPL-2.0
+ */
+
 :root {
   --swiftSliderViewHeight: auto;
   --swiftSliderVerticalHeight: 800px;
@@ -5,6 +11,7 @@
   --swiftSliderButtonColor: #000;
   --swiftSliderTransitionDuration: 0.15s;
   --swiftSliderHoverBrightness: 0.7;
+  --swiftSliderGap: 0;
   --swiftSlideSelectedBorder: rgba(255, 255, 255, 0.5);
 }
 
@@ -12,8 +19,35 @@ swift-slider {
   display: block;
   position: relative;
 
-  &[data-slider-style="preview"] {
+  .swift-slide {
+    width: 100%;
+    min-width: 100%;
+    height: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    box-sizing: border-box;
+
+    img {
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  &[data-slider-force-height="true"] {
+
     .swift-slide {
+      height: var(--swiftSliderViewHeight);
+    }
+
+    .swift-slide img {
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &[data-slider-style="preview"]:not([data-slider-direction="vertical"]) {
+    .swift-slide {
+      min-width: 66.6666%;
       max-width: 66.6666%;
       scroll-snap-align: center;
     }
@@ -35,19 +69,12 @@ swift-slider {
   width: 100%;
   height: var(--swiftSliderViewHeight);
   scrollbar-width: none;
+  gap: var(--swiftSliderGap);
 
   &::-webkit-scrollbar {
     width: 0px;
-    background: transparent; /* make scrollbar transparent */
+    background: transparent;
   }
-}
-
-.swift-slide {
-  min-width: 66.6666%;
-  height: 100%;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  box-sizing: border-box;
 }
 
 .swift-slide--selected {
