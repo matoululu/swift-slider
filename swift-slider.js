@@ -29,21 +29,26 @@ class SwiftSlider extends HTMLElement {
       initialSlide: Number(this.dataset.initialSlide ? this.dataset.initialSlide : 0), // The initial slide to display
       sliderDirection: this.dataset.sliderDirection ? this.dataset.sliderDirection : 'horizontal', // Horizontal or vertical
       sliderSpeed: Number(this.dataset.sliderSpeed ? this.dataset.sliderSpeed : 0), //Speed of slider in seconds (0 = disabled)
-      showButtons: this.dataset.showButtons ? this.dataset.showButtons : 'false', // Show or hide buttons
-      showDots: this.dataset.showDots ? this.dataset.showDots : 'false', // Show or hide dots
+      showButtons: this.dataset.showButtons == 'true' ? 'true' : 'false', // Show or hide buttons
+      showDots: this.dataset.showDots == 'true' ? 'true' : 'false', // Show or hide dots
       sliderStyle: this.dataset.sliderStyle ? this.dataset.sliderStyle : null // The style of slider being shown
     }
   }
 
   connectedCallback() {
-    // Display initial slide
-    this.changeSlide(this.settings.initialSlide, false, 'instant');
-
     // Calculate slides per frame
     this.calculatePerView();
 
+    if (this.settings.perView === 1) { // If perView is 1, we don't need to calculate anything
+      this.totalCalculatedSlides = this.elements.slides.length;
+    } else { // If perView is greater than 1, we need to calculate the total number of dots to display
+      this.totalCalculatedSlides = (Math.round(this.elements.slides.length - this.settings.perView));
+    }
+
     // Generate buttons and dots
-    if (this.elements.slides.length > this.settings.perView) { this.generateButtons(); this.generateDots(); }
+    this.generateButtons();
+    this.generateDots();
+
     // Set slider speed
     if (this.settings.sliderSpeed !== 0) this.setSlideSpeed();
     // Set up navigation
@@ -52,12 +57,17 @@ class SwiftSlider extends HTMLElement {
     // Set up event listeners
     this.eventHandler();
 
+    // Display initial slide
+    this.changeSlide(this.settings.initialSlide, false, 'instant');
+
     // Emit event when slider is ready
     this.dispatchEvent(new CustomEvent('swift-slider:ready', { bubbles: true, detail: { slider: this } }));
   }
 
   changeSlide(targetIndex, skipScroll = false, behavior = 'smooth') {
     targetIndex = Number(targetIndex); // Ensure targetIndex is a number
+
+    if (targetIndex > this.totalCalculatedSlides ) targetIndex = 0; // If targetIndex is out of bounds go back to start
 
     if (!skipScroll) {  // If we aren't listening for scrolling
       if (this.settings.sliderDirection === 'horizontal') {
@@ -92,15 +102,8 @@ class SwiftSlider extends HTMLElement {
       return;
     }
 
-    if (this.settings.sliderDirection === 'horizontal') { // Set width of slides based off of perView
-      this.elements.slides.forEach(slide => {
-        slide.style = `width: ${100 / this.settings.perView}%; min-width: ${100 / this.settings.perView}%;`;
-      });
-    } else {
-      this.elements.slides.forEach(slide => {
-        slide.style = `height: ${100 / this.settings.perView}%; min-height: ${100 / this.settings.perView}%;`;
-      });
-    }
+    let slideWidth = `calc((100% - calc(1rem * (${this.settings.perView} - 1))) / ${this.settings.perView})`;
+    this.style.setProperty('--swiftSliderSlideWidth', `${slideWidth}`);
   }
 
   generateButtons() {
@@ -112,14 +115,14 @@ class SwiftSlider extends HTMLElement {
     const prevButton = document.createElement('button');
     prevButton.classList.add('swift-slider__button');
     prevButton.dataset.buttonPrev = '';
-    prevButton.innerHTML = '&larr;';
+    prevButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>';
     prevButton.setAttribute('aria-label', 'Previous');
     buttons.appendChild(prevButton);
 
     const nextButton = document.createElement('button');
     nextButton.classList.add('swift-slider__button');
     nextButton.dataset.buttonNext = '';
-    nextButton.innerHTML = '&rarr;';
+    nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
     nextButton.setAttribute('aria-label', 'Next');
     buttons.appendChild(nextButton);
 
@@ -131,7 +134,7 @@ class SwiftSlider extends HTMLElement {
     // Determine if prev button is pressed
     this.elements.prevButton.addEventListener('click', () => {
       if (this.states.currentIndex === 0) {
-        this.changeSlide(this.totalCalculatedSlides - 1);
+        this.changeSlide(this.totalCalculatedSlides );
       } else {
         this.changeSlide(this.states.currentIndex - 1);
       }
@@ -139,7 +142,7 @@ class SwiftSlider extends HTMLElement {
 
     // Determine if next button is pressed
     this.elements.nextButton.addEventListener('click', () => {
-      if (this.states.currentIndex === this.totalCalculatedSlides - 1) {
+      if (this.states.currentIndex === this.totalCalculatedSlides) {
         this.changeSlide(0);
       } else {
         this.changeSlide(this.states.currentIndex + 1);
@@ -150,16 +153,13 @@ class SwiftSlider extends HTMLElement {
   generateDots() {
     if (this.settings.showDots === 'false') return; // If showDots is false, don't generate dots
 
-    if (this.settings.perView === 1) { // If perView is 1, we don't need to calculate anything
-      this.totalCalculatedSlides = this.elements.slides.length;
-    } else { // If perView is greater than 1, we need to calculate the total number of dots to display
-      this.totalCalculatedSlides = (Math.floor(this.elements.slides.length / this.settings.perView) + 1);
-    }
-
     const dots = document.createElement('ul');
     dots.classList.add('swift-slider__dots');
 
-    for(let i = 0; i < this.totalCalculatedSlides; i++) {
+    let totalDots = this.totalCalculatedSlides;
+    if (this.totalCalculatedSlides == 1) totalDots = 2;
+
+    for(let i = 0; i < totalDots; i++) {
       const dot = document.createElement('li');
       dot.classList.add('swift-slider__dot');
       if (i === this.settings.initialSlide) dot.classList.add('swift-slider__dot--active');
@@ -192,7 +192,7 @@ class SwiftSlider extends HTMLElement {
       } else if (this.elements.view.scrollLeft === this.elements.view.scrollWidth) { // We're at the end of the slider
         this.changeSlide(this.totalCalculatedSlides - 1, true);
       } else { // Figure out where we are in the slider
-        this.changeSlide(Math.round(this.elements.view.scrollLeft / this.elements.slides[0].offsetWidth), true)
+        this.changeSlide(Math.round(this.elements.view.scrollLeft / this.elements.slides[0].offsetWidth), true);
       }
     } else {
       if (this.elements.view.scrollTop === 0) { // We're at the start of the slider
@@ -200,7 +200,7 @@ class SwiftSlider extends HTMLElement {
       } else if (this.elements.view.scrollTop === this.elements.view.scrollHeight) { // We're at the end of the slider
         this.changeSlide(this.totalCalculatedSlides - 1, true);
       } else { // Figure out where we are in the slider
-        this.changeSlide(Math.round(this.elements.view.scrollTop / this.elements.slides[0].offsetHeight), true)
+        this.changeSlide(Math.round(this.elements.view.scrollTop / this.elements.slides[0].offsetHeight), true);
       }
     }
   }
@@ -327,6 +327,13 @@ class SwiftSlider extends HTMLElement {
     this.elements.view.addEventListener('scrollend', () => {
       if (!this.states.scrolling) return;
       this.states.scrolling = false;
+
+      for(let i = 0; i < this.elements.slides.length; i++) {
+        this.elements.slides[i].classList.remove('swift-slide--active-slide');
+      }
+
+      this.elements.slides[this.states.currentIndex].classList.add('swift-slide--active-slide');
+
       this.dispatchEvent(new CustomEvent('swift-slider:settle', { bubbles: true,
         detail: {
           slider: this,

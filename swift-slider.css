@@ -4,14 +4,15 @@
  * License: MPL-2.0
  */
 
-:root {
+ :root {
   --swiftSliderViewHeight: auto;
   --swiftSliderVerticalHeight: 800px;
-  --swiftSliderButtonBackground: #fff;
-  --swiftSliderButtonColor: #000;
+  --swiftSliderButtonBackground: var(--bodyFontColor);
+  --swiftSliderButtonColor: var(--bodyBG);
   --swiftSliderTransitionDuration: 0.15s;
   --swiftSliderHoverBrightness: 0.7;
-  --swiftSliderGap: 0;
+  --swiftSliderGap: 1rem;
+  --swiftSliderSlideWidth: 100%;
   --swiftSlideSelectedBorder: rgba(255, 255, 255, 0.5);
 }
 
@@ -20,6 +21,7 @@ swift-slider {
   position: relative;
 
   .swift-slide {
+    position: relative;
     width: 100%;
     min-width: 100%;
     height: 100%;
@@ -27,9 +29,15 @@ swift-slider {
     scroll-snap-stop: always;
     box-sizing: border-box;
 
-    img {
+    @media only screen and (max-width: 768px) {
+      min-width: 100% !important; /* Ensure the slide takes the full width */
+      width: 100% !important; /* Ensure the slide takes the full width */
+    }
+
+    img,
+    svg {
       width: 100%;
-      height: auto;
+      height: 100%;
     }
   }
 
@@ -53,8 +61,8 @@ swift-slider {
     }
 
     .swift-slide:last-child {
-        margin-right: 33.3333%;
-      }
+      margin-right: 33.3333%;
+    }
 
     .swift-slide:first-child {
       margin-left: 33.3333%;
@@ -63,13 +71,16 @@ swift-slider {
 }
 
 .swift-slider__view {
-  display: flex;
+  display: grid;
   overflow-x: scroll;
   scroll-snap-type: x mandatory;
   width: 100%;
   height: var(--swiftSliderViewHeight);
   scrollbar-width: none;
-  gap: var(--swiftSliderGap);
+  grid-gap: var(--swiftSliderGap);
+  grid-auto-flow: column;
+  grid-auto-rows: 100%;
+  grid-auto-columns: var(--swiftSliderSlideWidth);
 
   &::-webkit-scrollbar {
     width: 0px;
@@ -91,17 +102,20 @@ swift-slider {
   left: 0;
   transform: translateY(-50%);
   z-index: 1;
+
+  @media only screen and (max-width: 768px) {
+    display: none;
+  }
 }
 
 .swift-slider__button {
   background-color: var(--swiftSliderButtonBackground);
   color: var(--swiftSliderButtonColor);
-  padding: 1rem;
   border-radius: 50%;
   border: none;
-  font-size: 20px;
-  width: 50px;
-  height: 50px;
+  font-size: var(--spacing-xl);
+  width: var(--spacing-xl);
+  height: var(--spacing-xl);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -120,11 +134,19 @@ swift-slider {
 }
 
 .swift-slider__button[data-button-prev] {
-  left: 10px;
+  left: -3.5rem;
+
+  @media only screen and (max-width: 1080px) {
+    left: 1rem;
+  }
 }
 
 .swift-slider__button[data-button-next] {
-  right: 10px;
+  right: -3.5rem;
+
+  @media only screen and (max-width: 1080px) {
+    right: 1rem;
+  }
 }
 
 .swift-slider__dots {
@@ -139,6 +161,10 @@ swift-slider {
   list-style: none;
   margin: 0;
   padding: 0;
+
+  @media only screen and (max-width: 768px) {
+    display: none;
+  }
 }
 
 .swift-slider__dot {
