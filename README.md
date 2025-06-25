@@ -2,7 +2,7 @@
 A modern way to make slideshows
 
 ## Demo
-https://codepen.io/matouio/pen/qBgGpGd?editors=1010
+[https://codepen.io/matouio/pen/qBgGpGd?editors=1010](https://codepen.io/matouio/full/qBgGpGd)
 
 ## How to install animape
 
